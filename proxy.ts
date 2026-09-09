@@ -16,6 +16,14 @@ function isPublicPath(pathname: string) {
   );
 }
 
+function isPublicAuthPath(pathname: string) {
+  return (
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname.startsWith("/auth/callback")
+  );
+}
+
 function timingSafeEqual(a: string, b: string) {
   const encoder = new TextEncoder();
   const aBytes = encoder.encode(a);
@@ -110,7 +118,10 @@ function appPasswordMissingResponse() {
 }
 
 export function proxy(request: NextRequest) {
-  if (isPublicPath(request.nextUrl.pathname)) {
+  if (
+    isPublicPath(request.nextUrl.pathname) ||
+    isPublicAuthPath(request.nextUrl.pathname)
+  ) {
     return NextResponse.next();
   }
 
