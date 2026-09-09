@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
+import { getAuthenticatedUser } from "@/lib/auth/get-authenticated-user";
 import {
   transactionFiltersSchema,
   transactionSchema,
@@ -106,6 +107,9 @@ function toDTO(row: TransactionRow, today: Date): TransactionDTO {
 export async function createTransactionAction(
   input: unknown,
 ): Promise<ActionResult<TransactionDTO>> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { success: false, message: "Usuário não autenticado." };
+
   const parsed = transactionSchema.safeParse(input);
 
   if (!parsed.success) {
@@ -146,6 +150,7 @@ export async function createTransactionAction(
     frequency: recurrence === "FIXED" ? frequency : null,
     installmentNumber: recurrence === "INSTALLMENT" ? index + 1 : null,
     installmentTotal: recurrence === "INSTALLMENT" ? total : null,
+    userId: user.id,
   }));
 
   try {
@@ -163,6 +168,9 @@ export async function createTransactionAction(
 export async function getTransactionsAction(
   filters?: unknown,
 ): Promise<ActionResult<TransactionDTO[]>> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { success: false, message: "Usuário não autenticado." };
+
   const parsed = transactionFiltersSchema.safeParse(filters ?? {});
 
   if (!parsed.success) {
@@ -170,7 +178,7 @@ export async function getTransactionsAction(
   }
 
   const { month, year, type, isPaid } = parsed.data;
-  const where: Prisma.TransactionWhereInput = {};
+  const where: Prisma.TransactionWhereInput = { userId: user.id };
 
   if (month && year) {
     where.dueDate = {
@@ -205,6 +213,9 @@ export async function updateTransactionAction(
   data: unknown,
   updateMode: UpdateMode = "SINGLE",
 ): Promise<ActionResult<TransactionDTO>> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { success: false, message: "Usuário não autenticado." };
+
   const parsed = updateTransactionSchema.safeParse({
     ...(data as Record<string, unknown>),
     id,
@@ -221,7 +232,9 @@ export async function updateTransactionAction(
   const { title, type, paymentMethod, dueDate, amount, isPaid } = parsed.data;
 
   try {
-    const current = await prisma.transaction.findUnique({ where: { id } });
+    const current = await prisma.transaction.findFirst({
+      where: { id, userId: user.id },
+    });
 
     if (!current) {
       return { success: false, message: "Lançamento não encontrado." };
@@ -234,42 +247,55 @@ export async function updateTransactionAction(
       ...(amount !== undefined && { amount: amount.toFixed(2) }),
     };
 
-    const updated = await prisma.transaction.update({
-      where: { id },
-      data: {
-        ...sharedData,
-        ...(title !== undefined && { title: buildTitle(title, current) }),
-        ...(dueDate !== undefined && { dueDate }),
-        ...(isPaid !== undefined && { isPaid }),
-      },
-    });
-
-    if (updateMode === "FUTURE" && current.groupId) {
-      const siblings = await prisma.transaction.findMany({
-        where: {
-          groupId: current.groupId,
-          dueDate: { gt: current.dueDate },
+    const updated = await prisma.$transaction(async (transaction) => {
+      const updatedResult = await transaction.transaction.updateMany({
+        where: { id, userId: user.id },
+        data: {
+          ...sharedData,
+          ...(title !== undefined && { title: buildTitle(title, current) }),
+          ...(dueDate !== undefined && { dueDate }),
+          ...(isPaid !== undefined && { isPaid }),
         },
-        select: { id: true, recurrence: true, installmentNumber: true, installmentTotal: true },
       });
 
-      if (siblings.length > 0) {
-        await prisma.$transaction(
-          siblings.map((sibling) =>
-            prisma.transaction.update({
-              where: { id: sibling.id },
-              data: {
-                ...sharedData,
-                // dueDate e isPaid sao proprios de cada ocorrencia e nao se propagam.
-                ...(title !== undefined && {
-                  title: buildTitle(title, sibling),
-                }),
-              },
-            }),
-          ),
-        );
+      if (updatedResult.count !== 1) {
+        throw new Error("Transaction ownership changed.");
       }
-    }
+
+      const updatedTransaction = await transaction.transaction.findFirstOrThrow({
+        where: { id, userId: user.id },
+      });
+
+      if (updateMode === "FUTURE" && current.groupId) {
+        const siblings = await transaction.transaction.findMany({
+          where: {
+            groupId: current.groupId,
+            userId: user.id,
+            dueDate: { gt: current.dueDate },
+          },
+          select: { id: true, recurrence: true, installmentNumber: true, installmentTotal: true },
+        });
+
+        if (siblings.length > 0) {
+          await Promise.all(
+            siblings.map((sibling) =>
+              transaction.transaction.update({
+                where: { id: sibling.id },
+                data: {
+                  ...sharedData,
+                  // dueDate e isPaid sao proprios de cada ocorrencia e nao se propagam.
+                  ...(title !== undefined && {
+                    title: buildTitle(title, sibling),
+                  }),
+                },
+              }),
+            ),
+          );
+        }
+      }
+
+      return updatedTransaction;
+    });
 
     revalidateBudget();
     return { success: true, data: toDTO(updated, startOfToday()) };
@@ -281,9 +307,12 @@ export async function updateTransactionAction(
 export async function toggleTransactionPaidStatusAction(
   id: string,
 ): Promise<ActionResult<TransactionDTO>> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { success: false, message: "Usuário não autenticado." };
+
   try {
-    const current = await prisma.transaction.findUnique({
-      where: { id },
+    const current = await prisma.transaction.findFirst({
+      where: { id, userId: user.id },
       select: { isPaid: true },
     });
 
@@ -291,9 +320,15 @@ export async function toggleTransactionPaidStatusAction(
       return { success: false, message: "Lançamento não encontrado." };
     }
 
-    const updated = await prisma.transaction.update({
-      where: { id },
-      data: { isPaid: !current.isPaid },
+    const updated = await prisma.$transaction(async (transaction) => {
+      const result = await transaction.transaction.updateMany({
+        where: { id, userId: user.id },
+        data: { isPaid: !current.isPaid },
+      });
+
+      if (result.count !== 1) throw new Error("Transaction ownership changed.");
+
+      return transaction.transaction.findFirstOrThrow({ where: { id, userId: user.id } });
     });
 
     revalidateBudget();
@@ -306,8 +341,16 @@ export async function toggleTransactionPaidStatusAction(
 export async function deleteTransactionAction(
   id: string,
 ): Promise<ActionResult<{ id: string }>> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { success: false, message: "Usuário não autenticado." };
+
   try {
-    await prisma.transaction.delete({ where: { id } });
+    const result = await prisma.transaction.deleteMany({
+      where: { id, userId: user.id },
+    });
+    if (result.count !== 1) {
+      return { success: false, message: "Lançamento não encontrado." };
+    }
     revalidateBudget();
     return { success: true, data: { id } };
   } catch {
@@ -318,9 +361,12 @@ export async function deleteTransactionAction(
 export async function deleteTransactionSeriesAction(
   id: string,
 ): Promise<ActionResult<{ deleted: number }>> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { success: false, message: "Usuário não autenticado." };
+
   try {
-    const current = await prisma.transaction.findUnique({
-      where: { id },
+    const current = await prisma.transaction.findFirst({
+      where: { id, userId: user.id },
       select: { groupId: true, dueDate: true },
     });
 
@@ -329,7 +375,7 @@ export async function deleteTransactionSeriesAction(
     }
 
     if (!current.groupId) {
-      await prisma.transaction.delete({ where: { id } });
+      await prisma.transaction.deleteMany({ where: { id, userId: user.id } });
       revalidateBudget();
       return { success: true, data: { deleted: 1 } };
     }
@@ -337,6 +383,7 @@ export async function deleteTransactionSeriesAction(
     const result = await prisma.transaction.deleteMany({
       where: {
         groupId: current.groupId,
+        userId: user.id,
         dueDate: { gte: current.dueDate },
       },
     });
@@ -361,6 +408,9 @@ export async function getProjectionAction(
   months: number,
   startingBalance = 0,
 ): Promise<ActionResult<MonthProjection[]>> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { success: false, message: "Usuário não autenticado." };
+
   const horizon = Math.min(Math.max(Math.trunc(months) || 12, 1), 24);
   const opening = Number.isFinite(startingBalance) ? startingBalance : 0;
   const now = new Date();
@@ -369,7 +419,7 @@ export async function getProjectionAction(
 
   try {
     const rows = await prisma.transaction.findMany({
-      where: { dueDate: { gte: start, lt: end } },
+      where: { userId: user.id, dueDate: { gte: start, lt: end } },
       select: { dueDate: true, amount: true, type: true, isPaid: true },
     });
 

@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Orçamento Pessoal
 
-## Getting Started
+Portal pessoal para acompanhar receitas, despesas, lançamentos recorrentes e projeções financeiras.
 
-First, run the development server:
+## Stack
+
+- Next.js App Router, React e TypeScript
+- Supabase Auth com login por e-mail e Google OAuth
+- Prisma 7 e PostgreSQL
+- Groq para importação assistida por IA
+- Vitest para testes unitários de ownership
+- PWA com manifest e service worker para assets públicos
+
+## Configuração local
+
+1. Instale as dependências:
+
+```bash
+npm install
+```
+
+2. Copie `.env.example` para `.env` e preencha os valores do ambiente local.
+
+As variáveis `NEXT_PUBLIC_*` são valores públicos de runtime. Chaves do Groq, senha do app, URLs de banco e chaves administrativas Supabase devem permanecer server-side e nunca devem ser commitadas.
+
+3. Suba o PostgreSQL local:
+
+```bash
+npm run db:up
+```
+
+O banco fica disponível somente em `127.0.0.1:5433`.
+
+4. Gere/aplique migrations somente quando a etapa de banco estiver autorizada:
+
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+5. Inicie o desenvolvimento:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A aplicação local fica em `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Autenticação
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+O portal usa Supabase Auth. O callback local é `/auth/callback`; configure os Redirect URLs no projeto Supabase e no provedor Google conforme o ambiente. O Basic Auth permanece temporariamente como camada adicional para as rotas protegidas.
 
-## Learn More
+## Testes e validação
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run test
+npm run lint
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Os testes unitários mockam autenticação, Prisma e providers externos. Eles não devem ser usados como substitutos dos testes de integração com um PostgreSQL isolado.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+O script `scripts/backfill-local.ts` é administrativo e restrito ao banco local. Execute-o somente com autorização explícita e nunca contra produção.
 
-## Deploy on Vercel
+## Segurança
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Não commit `.env`, tokens, senhas, connection strings, chaves administrativas ou qualquer outro secret. Use `.env.example` apenas como referência de nomes e valores fictícios.

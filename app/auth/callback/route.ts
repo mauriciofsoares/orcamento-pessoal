@@ -2,15 +2,31 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-function safeNextPath(value: string | null) {
-  return value?.startsWith("/") ? value : "/";
+export function safeNextPath(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) {
+    return "/";
+  }
+
+  return value;
 }
 
-function getRequestOrigin(request: NextRequest) {
-  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
-  const protocol = request.headers.get("x-forwarded-proto") ?? "http";
+function getConfiguredOrigin() {
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!configuredSiteUrl) return null;
 
-  return host ? `${protocol}://${host}` : request.nextUrl.origin;
+  try {
+    const url = new URL(configuredSiteUrl);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.origin : null;
+  } catch {
+    return null;
+  }
+}
+
+export function getRequestOrigin(request: NextRequest) {
+  const configuredOrigin = getConfiguredOrigin();
+  if (configuredOrigin) return configuredOrigin;
+
+  return request.nextUrl.origin;
 }
 
 export async function GET(request: NextRequest) {

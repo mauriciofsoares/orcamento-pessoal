@@ -7,6 +7,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { parseCurrencyInput } from "@/lib/format";
 import type { ActionResult } from "@/actions/transactions";
+import { getAuthenticatedUser } from "@/lib/auth/get-authenticated-user";
 
 const MAX_INPUT_CHARS = 8000;
 const MAX_ITEMS = 200;
@@ -476,6 +477,9 @@ function withTimeout<T>(promise: Promise<T>, ms: number) {
 export async function importWithAIAction(
   rawText: string,
 ): Promise<ActionResult<{ transactions: AiTransaction[]; discarded: number }>> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { success: false, message: "Usuário não autenticado." };
+
   const text = rawText.trim();
 
   if (text.length < 10) {
@@ -600,6 +604,10 @@ export async function importWithAIAction(
 export async function saveAiTransactionsAction(
   items: unknown,
 ): Promise<ActionResult<{ imported: number }>> {
+  const user = await getAuthenticatedUser();
+
+  if (!user) return { success: false, message: "Usuário não autenticado." };
+
   const parsed = z.array(persistedSchema).max(MAX_ITEMS).safeParse(items);
 
   if (!parsed.success || parsed.data.length === 0) {
@@ -618,6 +626,7 @@ export async function saveAiTransactionsAction(
             dueDate: new Date(`${item.dueDate}T12:00:00.000Z`),
             amount: item.amount.toFixed(2),
             isPaid: item.type === "INCOME",
+            userId: user.id,
           },
         }),
       ),

@@ -1,5 +1,5 @@
 const CACHE_NAME = "orcamento-pessoal-v1";
-const OFFLINE_URLS = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
+const OFFLINE_URLS = ["/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -24,9 +24,9 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+  if (event.request.method !== "GET" || event.request.mode === "navigate") return;
 
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request).then((cached) => cached ?? caches.match("/"))),
+    fetch(event.request).catch(() => caches.match(event.request)),
   );
 });

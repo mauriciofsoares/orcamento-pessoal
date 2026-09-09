@@ -1,0 +1,18 @@
+services:
+  postgres-integration:
+    image: postgres:17-alpine
+    container_name: orcamento-pessoal-integration-db
+    restart: "no"
+    environment:
+      POSTGRES_USER: ${TEST_POSTGRES_USER:?Set TEST_POSTGRES_USER in the shell}
+      POSTGRES_PASSWORD: ${TEST_POSTGRES_PASSWORD:?Set TEST_POSTGRES_PASSWORD in the shell}
+      POSTGRES_DB: orcamento_pessoal_integration
+    ports:
+      - "127.0.0.1:55432:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 5s
+      retries: 15

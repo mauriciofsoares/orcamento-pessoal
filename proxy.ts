@@ -2,9 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const PUBLIC_FILE = /\.(?:png|jpg|jpeg|gif|webp|svg|ico|txt|xml|json|webmanifest|js|css|map)$/i;
-
-function isPublicPath(pathname: string) {
+export function isPublicPath(pathname: string) {
   return (
     pathname.startsWith("/_next/static") ||
     pathname.startsWith("/_next/image") ||
@@ -12,16 +10,15 @@ function isPublicPath(pathname: string) {
     pathname === "/sw.js" ||
     pathname === "/favicon.ico" ||
     pathname === "/icon-192.png" ||
-    pathname === "/icon-512.png" ||
-    PUBLIC_FILE.test(pathname)
+    pathname === "/icon-512.png"
   );
 }
 
-function isPublicAuthPath(pathname: string) {
+export function isPublicAuthPath(pathname: string) {
   return (
     pathname === "/login" ||
     pathname === "/signup" ||
-    pathname.startsWith("/auth/callback")
+    pathname === "/auth/callback"
   );
 }
 

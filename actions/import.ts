@@ -5,6 +5,7 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { prisma } from "@/lib/prisma";
 import type { ActionResult } from "@/actions/transactions";
+import { getAuthenticatedUser } from "@/lib/auth/get-authenticated-user";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const MAX_ROWS = 5000;
@@ -141,6 +142,9 @@ function findColumns(rows: string[][]) {
 export async function importTransactionsAction(
   formData: FormData,
 ): Promise<ActionResult<ImportSummary>> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { success: false, message: "Usuário não autenticado." };
+
   const file = formData.get("file");
 
   if (!(file instanceof File) || file.size === 0) {
@@ -266,7 +270,11 @@ export async function importTransactionsAction(
 
   try {
     await prisma.$transaction(
-      pending.map((data) => prisma.transaction.create({ data })),
+      pending.map((data) =>
+        prisma.transaction.create({
+          data: { ...data, userId: user.id },
+        }),
+      ),
     );
 
     revalidatePath("/");
