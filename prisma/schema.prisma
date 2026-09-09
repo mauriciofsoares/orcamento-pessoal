@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum RecurrenceType {
+  SINGLE
+  INSTALLMENT
+  FIXED
+}
+
+enum RecurrenceFrequency {
+  MONTHLY
+  YEARLY
+}
+
+model Transaction {
+  id            String          @id @default(uuid()) @db.Uuid
+  title         String
+  type          TransactionType
+  paymentMethod String
+  dueDate       DateTime        @db.Date
+  amount        Decimal         @db.Decimal(12, 2)
+  isPaid        Boolean         @default(false)
+
+  // Série gerada de uma vez (parcelamento ou despesa fixa): todas as ocorrências
+  // compartilham o mesmo groupId para poderem ser editadas/removidas em bloco.
+  groupId           String?              @db.Uuid
+  recurrence        RecurrenceType       @default(SINGLE)
+  frequency         RecurrenceFrequency?
+  installmentNumber Int?
+  installmentTotal  Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dueDate])
+  @@index([isPaid])
+  @@index([type])
+  @@index([groupId])
+}
