@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import type { User } from "@supabase/supabase-js";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { MainNav } from "@/components/MainNav";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -48,7 +50,17 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  let user: User | null = null;
+
+  try {
+    const supabase = await createClient();
+    const result = await supabase.auth.getUser();
+    user = result.data.user;
+  } catch {
+    user = null;
+  }
+
   return (
     <html
       lang="pt-BR"
@@ -57,7 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <ServiceWorkerRegister />
-        <MainNav />
+        <MainNav user={user} />
         {children}
         <Toaster theme="system" position="top-right" richColors closeButton />
       </body>

@@ -29,7 +29,7 @@ export function LogoutButton() {
       setError(
         signOutError instanceof Error
           ? signOutError.message
-          : "Não foi possível sair.",
+          : "NÃ£o foi possÃ­vel sair.",
       );
     } finally {
       setIsLoading(false);

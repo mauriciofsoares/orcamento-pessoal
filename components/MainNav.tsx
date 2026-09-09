@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 import { LayoutDashboard, TrendingUp, Wallet } from "lucide-react";
+import { LogoutButton } from "@/components/LogoutButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const LINKS = [
@@ -10,8 +12,17 @@ const LINKS = [
   { href: "/projection", label: "Projeção", icon: TrendingUp },
 ];
 
-export function MainNav() {
+function getUserName(user: User) {
+  const metadata = user.user_metadata;
+  const name = metadata.full_name ?? metadata.name;
+
+  return typeof name === "string" && name.trim() ? name.trim() : user.email;
+}
+
+export function MainNav({ user }: { user: User | null }) {
   const pathname = usePathname();
+
+  if (pathname === "/login" || pathname === "/signup") return null;
 
   return (
     <header className="border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
@@ -43,7 +54,24 @@ export function MainNav() {
           })}
         </nav>
 
-        <ThemeToggle />
+        <div className="ml-auto flex min-w-0 items-center gap-3">
+          {user && (
+            <div className="flex min-w-0 items-center gap-2" title={user.email ?? undefined}>
+              <div className="hidden min-w-0 text-right sm:block">
+                <p className="max-w-40 truncate text-sm font-medium text-slate-800 dark:text-slate-200">
+                  {getUserName(user)}
+                </p>
+                {user.email && user.email !== getUserName(user) && (
+                  <p className="max-w-40 truncate text-xs text-slate-500 dark:text-slate-400">
+                    {user.email}
+                  </p>
+                )}
+              </div>
+              <LogoutButton />
+            </div>
+          )}
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

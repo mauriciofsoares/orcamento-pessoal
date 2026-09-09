@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
 const PUBLIC_FILE = /\.(?:png|jpg|jpeg|gif|webp|svg|ico|txt|xml|json|webmanifest|js|css|map)$/i;
 
@@ -50,6 +51,38 @@ function getBasicPassword(request: NextRequest) {
     return decoded.slice(separatorIndex + 1);
   } catch {
     return null;
+  }
+}
+
+async function hasSupabaseUser(request: NextRequest, response: NextResponse) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) return false;
+
+  try {
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet, headers) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
+          Object.entries(headers).forEach(([name, value]) => {
+            response.headers.set(name, value);
+          });
+        },
+      },
+    });
+
+    const { data } = await supabase.auth.getUser();
+    return Boolean(data.user);
+  } catch {
+    return false;
   }
 }
 
@@ -117,13 +150,16 @@ function appPasswordMissingResponse() {
   );
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   if (
     isPublicPath(request.nextUrl.pathname) ||
     isPublicAuthPath(request.nextUrl.pathname)
   ) {
     return NextResponse.next();
   }
+
+  const response = NextResponse.next();
+  if (await hasSupabaseUser(request, response)) return response;
 
   const appPassword = process.env.APP_PASSWORD;
   if (!appPassword) {
@@ -135,7 +171,7 @@ export function proxy(request: NextRequest) {
     return passwordRequiredResponse();
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
