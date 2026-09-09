@@ -9,15 +9,15 @@ if (!connectionString) {
 }
 
 const databaseUrl = connectionString;
+const isSupabaseUrl = databaseUrl.includes("supabase.com");
+const rejectUnauthorized =
+  process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === "true";
 
 function createPrismaClient() {
   const pool = new Pool({
     connectionString: databaseUrl,
-    ssl: databaseUrl.includes("supabase.com")
-      ? {
-          rejectUnauthorized:
-            process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== "false",
-        }
+    ssl: isSupabaseUrl
+      ? { rejectUnauthorized }
       : undefined,
   });
 
