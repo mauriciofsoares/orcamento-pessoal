@@ -16,6 +16,7 @@ const rejectUnauthorized =
 function createPrismaClient() {
   const pool = new Pool({
     connectionString: databaseUrl,
+    max: 1,
     ssl: isSupabaseUrl
       ? { rejectUnauthorized }
       : undefined,
