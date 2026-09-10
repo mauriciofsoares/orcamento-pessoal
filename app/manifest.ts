@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Or\u00e7amento Pessoal",
-    short_name: "Or\u00e7amento",
-    description: "Controle pessoal de receitas, despesas e proje\u00e7\u00f5es.",
+    name: "Saldo Seguro",
+    short_name: "Saldo Seguro",
+    description: "Tenha clareza sobre o seu dinheiro.",
     start_url: "/",
     scope: "/",
     display: "standalone",
