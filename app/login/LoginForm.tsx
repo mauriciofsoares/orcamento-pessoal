@@ -106,8 +106,8 @@ export function LoginForm({ initialError = null }: { initialError?: string | nul
           <div className="flex size-16 items-center justify-center rounded-2xl bg-[#10B981] [@media(max-height:850px)]:size-14">
             <img
               alt=""
-              className="block h-[37.12px] w-[37.12px] max-w-none"
-              src="/login-assets/growth-chart.svg"
+              className="block size-full rounded-2xl"
+              src="/icon-192.png"
             />
           </div>
           <p className="font-outfit text-2xl font-bold text-[#F8FAFC] [@media(max-height:850px)]:text-xl">Saldo Seguro</p>

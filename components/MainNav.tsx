@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import { LayoutDashboard, TrendingUp, Wallet } from "lucide-react";
+import { LayoutDashboard, TrendingUp } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -28,8 +28,8 @@ export function MainNav({ user }: { user: User | null }) {
     <header className="border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
       <div className="mx-auto flex w-full max-w-[92rem] items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6 lg:px-8">
         <span className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-200">
-          <Wallet className="size-4 text-emerald-400" aria-hidden />
-          <span className="hidden sm:inline">Orçamento</span>
+          <img alt="" className="size-5" src="/icon-192.png" />
+          <span className="hidden sm:inline">Saldo Seguro</span>
         </span>
 
         <nav className="flex min-w-0 items-center gap-1">

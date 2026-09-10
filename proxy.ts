@@ -10,7 +10,7 @@ export function isPublicPath(pathname: string) {
     pathname.startsWith("/login-assets/") ||
     pathname === "/manifest.webmanifest" ||
     pathname === "/sw.js" ||
-    pathname === "/favicon.ico" ||
+    pathname === "/icon.png" ||
     pathname === "/icon-192.png" ||
     pathname === "/icon-512.png"
   );

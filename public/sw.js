@@ -1,4 +1,4 @@
-const CACHE_NAME = "orcamento-pessoal-v1";
+const CACHE_NAME = "saldo-seguro-v2";
 const OFFLINE_URLS = ["/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
 
 self.addEventListener("install", (event) => {

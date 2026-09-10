@@ -100,13 +100,12 @@ describe("proxy public paths", () => {
   it.each([
     "/manifest.webmanifest",
     "/sw.js",
-    "/favicon.ico",
+    "/icon.png",
     "/icon-192.png",
     "/icon-512.png",
     "/_next/static/chunk.js",
     "/_next/image?url=%2Ficon-192.png",
     "/login-assets/ambient-glow.svg",
-    "/login-assets/growth-chart.svg",
     "/login-assets/google-icon.png",
   ])("allows required public path %s", (path) => {
     expect(isPublicPath(path)).toBe(true);
