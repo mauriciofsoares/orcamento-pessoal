@@ -42,7 +42,7 @@ export function LogoutButton() {
         type="button"
         onClick={handleLogout}
         disabled={isLoading}
-        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+        className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-[#334155] px-3.5 text-sm font-bold text-[#F8FAFC] transition-colors hover:border-[#475569] hover:bg-[#1E293B] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isLoading ? (
           <Loader2 className="size-4 animate-spin" aria-hidden />
@@ -51,7 +51,7 @@ export function LogoutButton() {
         )}
         Sair
       </button>
-      {error && <p className="text-xs text-rose-500">{error}</p>}
+      {error && <p className="text-xs text-[#F87171]">{error}</p>}
     </div>
   );
 }

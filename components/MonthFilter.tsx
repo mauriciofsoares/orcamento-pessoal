@@ -25,14 +25,14 @@ export function MonthFilter({
   }
 
   const selectClass =
-    "cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 outline-none transition-colors hover:border-slate-400 focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600";
+    "cursor-pointer rounded-lg border border-[#334155] bg-[#172033] px-3 py-2 text-sm font-bold text-[#F8FAFC] outline-none transition-colors hover:border-[#475569] focus:border-[#10B981]";
 
   return (
     <div
       className={`flex items-center gap-2 ${isPending ? "opacity-60" : ""}`}
       aria-busy={isPending}
     >
-      <CalendarDays className="size-4 text-slate-400 dark:text-slate-500" aria-hidden />
+      <CalendarDays className="size-4 text-[#F8FAFC]" aria-hidden />
       <select
         aria-label="Mês"
         className={selectClass}
@@ -45,7 +45,6 @@ export function MonthFilter({
           </option>
         ))}
       </select>
-      <span className="text-slate-400 dark:text-slate-600">/</span>
       <select
         aria-label="Ano"
         className={selectClass}

@@ -22,17 +22,17 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const transactions = result.success ? result.data : [];
 
   return (
-    <main className="mx-auto w-full max-w-[92rem] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <main className="mx-auto w-full max-w-[1440px] px-4 py-7 sm:px-8 lg:px-10">
+      <header className="mb-7 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-950 dark:text-slate-100">
+          <h1 className="font-outfit text-3xl font-bold text-[#F8FAFC] sm:text-[40px]">
             Orçamento pessoal
           </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-sm text-[#94A3B8]">
             {MONTH_NAMES[month - 1]} de {year}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+        <div className="flex flex-wrap items-center gap-3 lg:justify-end">
           <AiImportButton />
           <ImportSheetButton />
           <TransactionForm />
@@ -40,12 +40,12 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       </header>
 
       {!result.success && (
-        <p className="mb-6 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
+        <p className="mb-6 rounded-lg border border-[#F87171]/30 bg-[#F87171]/10 px-4 py-3 text-sm text-[#F87171]">
           {result.message}
         </p>
       )}
 
-      <div className="space-y-6">
+      <div className="space-y-5">
         <SummaryCards transactions={transactions} />
         <TransactionTable
           transactions={transactions}

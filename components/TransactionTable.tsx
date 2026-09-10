@@ -196,7 +196,7 @@ function TransactionRow({
 
   return (
     <tr
-      className={`border-t border-slate-200 transition-colors hover:bg-slate-100/70 dark:border-slate-800 dark:hover:bg-slate-800/40 ${
+      className={`border-t border-[#334155] transition-colors hover:bg-[#172033] ${
         isBusy ? "opacity-50" : ""
       }`}
     >
@@ -211,30 +211,30 @@ function TransactionRow({
           <p
             className={`truncate font-medium ${
               transaction.isPaid
-                ? "text-slate-500 line-through"
-                : "text-slate-950 dark:text-slate-100"
+                ? "text-[#64748B] line-through"
+                : "text-[#F8FAFC]"
             }`}
           >
             {transaction.title}
           </p>
         </div>
       </td>
-      <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+      <td className="px-4 py-3 text-sm text-[#94A3B8]">
         <div className="flex items-center gap-2">
           <span>{transaction.paymentMethod}</span>
           <RecurrenceBadge transaction={transaction} />
         </div>
       </td>
-      <td className="px-4 py-3 text-sm tabular-nums text-slate-600 dark:text-slate-400">
+      <td className="px-4 py-3 text-sm tabular-nums text-[#94A3B8]">
         {formatDate(transaction.dueDate)}
       </td>
       <td
         className={`px-4 py-3 text-right font-medium tabular-nums ${
           transaction.isPaid
-            ? "text-slate-500 line-through"
+            ? "text-[#64748B] line-through"
             : isIncome
               ? "text-emerald-400"
-              : "text-slate-950 dark:text-slate-100"
+              : "text-[#F8FAFC]"
         }`}
       >
         {formatCurrency(transaction.amount)}
@@ -391,11 +391,11 @@ export function TransactionTable({
     : [{ label: "Excluir", onClick: () => runDelete("single") }];
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 dark:shadow-none">
-      <header className="flex flex-col gap-3 border-b border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
+    <section className="overflow-hidden rounded-2xl border border-[#334155] bg-[#1E293B]">
+      <header className="flex flex-col gap-3 border-b border-[#334155] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold text-slate-950 dark:text-slate-100">Lançamentos</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-500">
+          <h2 className="font-outfit text-xl font-semibold text-[#F8FAFC]">Lançamentos</h2>
+          <p className="text-xs text-[#64748B]">
             {transactions.length} registro(s) no período
           </p>
         </div>
@@ -429,13 +429,13 @@ export function TransactionTable({
           <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead>
-              <tr className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-500">
-                <th className="px-4 py-3 font-medium">Título</th>
-                <th className="px-4 py-3 font-medium">Método</th>
-                <th className="px-4 py-3 font-medium">Vencimento</th>
-                <th className="px-4 py-3 text-right font-medium">Valor</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 text-right font-medium">Ações</th>
+              <tr className="border-b border-[#334155] text-xs font-semibold uppercase text-[#64748B]">
+                <th className="px-5 py-3.5 font-semibold">Título</th>
+                <th className="px-5 py-3.5 font-semibold">Método</th>
+                <th className="px-5 py-3.5 font-semibold">Vencimento</th>
+                <th className="px-5 py-3.5 text-right font-semibold">Valor</th>
+                <th className="px-5 py-3.5 font-semibold">Status</th>
+                <th className="px-5 py-3.5 text-right font-semibold">Ações</th>
               </tr>
             </thead>
             <tbody>

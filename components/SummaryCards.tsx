@@ -13,24 +13,24 @@ type Tone = "neutral" | "danger" | "warning" | "critical";
 
 const TONE_STYLES: Record<Tone, { card: string; icon: string; value: string }> = {
   neutral: {
-    card: "border-slate-200 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 dark:shadow-none",
-    icon: "bg-emerald-500/10 text-emerald-400",
-    value: "text-emerald-400",
+    card: "border-[#334155] bg-[#1E293B]",
+    icon: "bg-[#F87171]/10 text-[#F87171]",
+    value: "text-[#F87171]",
   },
   danger: {
-    card: "border-slate-200 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 dark:shadow-none",
-    icon: "bg-rose-500/10 text-rose-400",
-    value: "text-slate-950 dark:text-slate-100",
+    card: "border-[#334155] bg-[#1E293B]",
+    icon: "bg-[#F8FAFC]/10 text-[#F8FAFC]",
+    value: "text-[#F8FAFC]",
   },
   warning: {
-    card: "border-amber-500/30 bg-amber-500/10",
-    icon: "bg-amber-500/15 text-amber-400",
-    value: "text-amber-300",
+    card: "border-[#334155] bg-[#1E293B]",
+    icon: "bg-[#FBBF24]/10 text-[#FBBF24]",
+    value: "text-[#FBBF24]",
   },
   critical: {
-    card: "border-rose-500/30 bg-rose-500/10",
-    icon: "bg-rose-500/15 text-rose-400",
-    value: "text-rose-300",
+    card: "border-[#334155] bg-[#1E293B]",
+    icon: "bg-[#F87171]/10 text-[#F87171]",
+    value: "text-[#F87171]",
   },
 };
 
@@ -52,10 +52,10 @@ function SummaryCard({
   const styles = TONE_STYLES[tone];
 
   return (
-    <div className={`rounded-2xl border p-5 transition-colors ${styles.card}`}>
+    <div className={`min-h-[140px] rounded-2xl border p-5 ${styles.card}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <p className="text-xs font-semibold uppercase text-[#94A3B8]">
             {label}
           </p>
           <p
@@ -67,10 +67,10 @@ function SummaryCard({
           </p>
         </div>
         <span className={`rounded-xl p-2.5 ${styles.icon}`}>
-          <Icon className="size-5" aria-hidden />
+          <Icon className="size-[18px]" aria-hidden />
         </span>
       </div>
-      <p className="mt-3 text-xs text-slate-500 dark:text-slate-500">{hint}</p>
+      <p className="mt-3 text-xs text-[#64748B]">{hint}</p>
     </div>
   );
 }
@@ -109,11 +109,11 @@ export function SummaryCards({
   const projectedBalance = totalIncome - totalExpenses;
 
   return (
-    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
       <SummaryCard
         label="Saldo atual"
         value={balance}
-        valueClassName={balance < 0 ? "text-rose-400" : "text-emerald-400"}
+        valueClassName={balance < 0 ? "text-[#F87171]" : "text-[#10B981]"}
         hint={`${formatCurrency(paidExpenses)} em despesas pagas`}
         icon={Wallet}
         tone="neutral"
@@ -122,7 +122,7 @@ export function SummaryCards({
         label="Saldo previsto"
         value={projectedBalance}
         valueClassName={
-          projectedBalance < 0 ? "text-rose-400" : "text-emerald-400"
+          projectedBalance < 0 ? "text-[#F87171]" : "text-[#10B981]"
         }
         hint={`${formatCurrency(totalIncome)} em entradas no mês`}
         icon={TrendingUp}
