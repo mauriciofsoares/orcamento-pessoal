@@ -97,7 +97,7 @@ describe("Recuperação de senha - contrato de comportamento", () => {
   it("envia o link por resetPasswordForEmail com callback seguro para /nova-senha", () => {
     expect(recoverPasswordFormSource).toContain("supabase.auth.resetPasswordForEmail");
     expect(recoverPasswordFormSource).toContain(
-      'buildAuthCallbackUrl(window.location.origin, "/nova-senha")',
+      '`${window.location.origin}/auth/callback?next=/nova-senha`',
     );
   });
 

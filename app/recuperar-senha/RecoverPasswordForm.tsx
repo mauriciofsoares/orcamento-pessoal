@@ -5,7 +5,6 @@ import { CircleCheck, Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { buildAuthCallbackUrl } from "@/lib/safe-next-path";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -56,7 +55,7 @@ export function RecoverPasswordForm() {
     try {
       const supabase = createClient();
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: buildAuthCallbackUrl(window.location.origin, "/nova-senha"),
+        redirectTo: `${window.location.origin}/auth/callback?next=/nova-senha`,
       });
 
       if (resetError) {
