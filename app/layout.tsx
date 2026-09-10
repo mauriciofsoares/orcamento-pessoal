@@ -25,12 +25,12 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Orçamento Pessoal",
-  description: "Controle do que falta pagar, dívidas futuras e receitas do mês",
-  applicationName: "Orçamento Pessoal",
+  title: "Saldo Seguro",
+  description: "Tenha clareza sobre o seu dinheiro.",
+  applicationName: "Saldo Seguro",
   appleWebApp: {
     capable: true,
-    title: "Orçamento",
+    title: "Saldo Seguro",
     statusBarStyle: "black-translucent",
   },
   icons: {
