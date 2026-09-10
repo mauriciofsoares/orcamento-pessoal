@@ -22,7 +22,14 @@ function getUserName(user: User) {
 export function MainNav({ user }: { user: User | null }) {
   const pathname = usePathname();
 
-  if (pathname === "/login" || pathname === "/signup") return null;
+  if (
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/recuperar-senha" ||
+    pathname === "/nova-senha"
+  ) {
+    return null;
+  }
 
   return (
     <header className="border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">

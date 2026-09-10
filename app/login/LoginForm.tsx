@@ -156,7 +156,7 @@ export function LoginForm({ initialError = null }: { initialError?: string | nul
               </label>
               <Link
                 className="text-[13px] font-semibold text-[#10B981] hover:underline"
-                href="/login"
+                href={`/recuperar-senha${email ? `?email=${encodeURIComponent(email)}` : ""}`}
               >
                 Esqueci minha senha
               </Link>

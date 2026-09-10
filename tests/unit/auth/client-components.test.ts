@@ -12,6 +12,11 @@ const loginFormSource = readFileSync("app/login/LoginForm.tsx", "utf8");
 const loginPageSource = readFileSync("app/login/page.tsx", "utf8");
 const signupPageSource = readFileSync("app/signup/page.tsx", "utf8");
 const signupFormSource = readFileSync("app/signup/SignUpForm.tsx", "utf8");
+const recoverPasswordFormSource = readFileSync(
+  "app/recuperar-senha/RecoverPasswordForm.tsx",
+  "utf8",
+);
+const newPasswordFormSource = readFileSync("app/nova-senha/NewPasswordForm.tsx", "utf8");
 const logoutButtonSource = readFileSync("components/LogoutButton.tsx", "utf8");
 
 describe("LoginForm - contrato de comportamento (login email/senha)", () => {
@@ -85,6 +90,21 @@ describe("SignUpForm - contrato de comportamento (next preservado, igual a Login
     expect(signupFormSource).toContain(
       'emailRedirectTo: buildAuthCallbackUrl(window.location.origin, searchParams.get("next"))',
     );
+  });
+});
+
+describe("Recuperação de senha - contrato de comportamento", () => {
+  it("envia o link por resetPasswordForEmail com callback seguro para /nova-senha", () => {
+    expect(recoverPasswordFormSource).toContain("supabase.auth.resetPasswordForEmail");
+    expect(recoverPasswordFormSource).toContain(
+      'buildAuthCallbackUrl(window.location.origin, "/nova-senha")',
+    );
+  });
+
+  it("atualiza a senha via Supabase e confirma o sucesso antes de redirecionar", () => {
+    expect(newPasswordFormSource).toContain("supabase.auth.updateUser({ password })");
+    expect(newPasswordFormSource).toContain('toast.success("Senha atualizada com sucesso.")');
+    expect(newPasswordFormSource).toContain('router.replace("/")');
   });
 });
 

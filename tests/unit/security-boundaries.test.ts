@@ -111,7 +111,7 @@ describe("proxy public paths", () => {
     expect(isPublicPath(path)).toBe(true);
   });
 
-  it.each(["/login", "/signup", "/auth/callback"])(
+  it.each(["/login", "/signup", "/recuperar-senha", "/nova-senha", "/auth/callback"])(
     "allows public auth path %s",
     (path) => {
       expect(isPublicAuthPath(path)).toBe(true);

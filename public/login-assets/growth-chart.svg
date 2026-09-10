@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Growth chart" clip-path="url(#clip0_0_4)">
+<path id="Trend arrow" d="M32 13.8V0H22.7M32 0L18.825 19.55L11.075 8.05L1 23" stroke="#08101F" stroke-width="2"/>
+<rect id="Bar" x="24" y="7" width="7" height="30" rx="2" fill="white"/>
+<rect id="Bar_2" x="13" y="16" width="7" height="21" rx="2" fill="white"/>
+<rect id="Bar_3" x="2" y="22" width="7" height="15" rx="2" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_0_4">
+<rect width="38" height="38" fill="white"/>
+</clipPath>
+</defs>
+</svg>

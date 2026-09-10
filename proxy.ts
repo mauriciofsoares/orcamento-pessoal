@@ -20,6 +20,8 @@ export function isPublicAuthPath(pathname: string) {
   return (
     pathname === "/login" ||
     pathname === "/signup" ||
+    pathname === "/recuperar-senha" ||
+    pathname === "/nova-senha" ||
     pathname === "/auth/callback"
   );
 }
