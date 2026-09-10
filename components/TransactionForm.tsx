@@ -152,7 +152,7 @@ export function TransactionForm({
         <button
           type="button"
           onClick={() => setInternalOpen(true)}
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#10B981] px-4 text-[13px] font-bold text-[#020617] transition-colors hover:bg-[#34D399]"
+          className="inline-flex h-[42px] w-full items-center justify-center gap-1.5 rounded-lg bg-[#10B981] px-3 text-[13px] font-bold text-[#020617] transition-colors hover:bg-[#34D399] lg:h-9 lg:w-auto lg:px-4"
         >
           <Plus className="size-4" aria-hidden />
           Novo lançamento

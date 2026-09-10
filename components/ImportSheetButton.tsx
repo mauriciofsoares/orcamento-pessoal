@@ -56,7 +56,7 @@ export function ImportSheetButton() {
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={isImporting}
-        className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#334155] bg-[#172033] px-4 text-[13px] font-bold text-[#F8FAFC] transition-colors hover:border-[#475569] hover:bg-[#1E293B] disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex h-[42px] w-full items-center justify-center gap-2 rounded-lg border border-[#334155] bg-[#172033] px-3 text-[13px] font-bold text-[#F8FAFC] transition-colors hover:border-[#475569] hover:bg-[#1E293B] disabled:cursor-not-allowed disabled:opacity-60 lg:h-9 lg:w-auto lg:px-4"
       >
         <Upload className="size-4" aria-hidden />
         {isImporting ? "Importando..." : "Importar planilha"}

@@ -46,7 +46,7 @@ function getServerSnapshot(): Theme {
   return "dark";
 }
 
-export function ThemeToggle() {
+export function ThemeToggle({ inMenu = false }: { inMenu?: boolean }) {
   const theme = useSyncExternalStore(
     subscribe,
     getPreferredTheme,
@@ -72,13 +72,18 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
       title={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
-      className="inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-[#334155] bg-[#1E293B] text-[#94A3B8] transition-colors hover:border-[#10B981] hover:text-[#F8FAFC]"
+      className={
+        inMenu
+          ? "flex h-[52px] w-full items-center gap-3.5 rounded-lg px-4 text-base font-medium text-[#F8FAFC] transition-colors hover:bg-[#172033]"
+          : "inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-[#334155] bg-[#1E293B] text-[#94A3B8] transition-colors hover:border-[#10B981] hover:text-[#F8FAFC]"
+      }
     >
       {isDark ? (
         <Sun className="pointer-events-none size-4" aria-hidden />
       ) : (
         <Moon className="pointer-events-none size-4" aria-hidden />
       )}
+      {inMenu && <span>Tema</span>}
     </button>
   );
 }

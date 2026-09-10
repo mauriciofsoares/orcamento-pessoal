@@ -74,7 +74,7 @@ export function AiImportButton() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="inline-flex h-9 items-center gap-2 rounded-[10px] border border-[#10B981] bg-[#10B981] px-4 text-[13px] font-bold text-white shadow-[0_2px_10px_rgba(15,186,130,0.3)] transition-colors hover:bg-[#34D399]"
+        className="col-span-2 inline-flex h-[42px] w-full items-center justify-center gap-2 rounded-lg border border-[#10B981] bg-[#10B981] px-4 text-[13px] font-bold text-[#06281E] shadow-[0_3px_12px_rgba(15,186,130,0.3)] transition-colors hover:bg-[#34D399] lg:h-9 lg:w-auto lg:text-white"
       >
         <Sparkles className="size-4" aria-hidden />
         Importação Inteligente

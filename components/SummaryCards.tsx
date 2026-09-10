@@ -52,25 +52,25 @@ function SummaryCard({
   const styles = TONE_STYLES[tone];
 
   return (
-    <div className={`min-h-[140px] rounded-2xl border p-5 ${styles.card}`}>
+    <div className={`min-h-[132px] rounded-2xl border p-3.5 sm:min-h-[140px] sm:p-5 ${styles.card}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase text-[#94A3B8]">
+          <p className="text-[10px] font-semibold uppercase text-[#94A3B8] sm:text-xs">
             {label}
           </p>
           <p
-            className={`mt-2 break-words text-2xl font-semibold tabular-nums leading-tight ${
+            className={`mt-2 break-words font-outfit text-xl font-bold tabular-nums leading-tight sm:text-2xl ${
               valueClassName ?? styles.value
             }`}
           >
             {formatCurrency(value)}
           </p>
         </div>
-        <span className={`rounded-xl p-2.5 ${styles.icon}`}>
-          <Icon className="size-[18px]" aria-hidden />
+        <span className={`rounded-[9px] p-2 ${styles.icon} sm:rounded-xl sm:p-2.5`}>
+          <Icon className="size-3.5 sm:size-[18px]" aria-hidden />
         </span>
       </div>
-      <p className="mt-3 text-xs text-[#64748B]">{hint}</p>
+      <p className="mt-3 text-[10px] text-[#64748B] sm:text-xs">{hint}</p>
     </div>
   );
 }
@@ -109,7 +109,7 @@ export function SummaryCards({
   const projectedBalance = totalIncome - totalExpenses;
 
   return (
-    <section className="grid shrink-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+    <section className="grid shrink-0 grid-cols-2 gap-2 sm:gap-4 xl:grid-cols-5">
       <SummaryCard
         label="Saldo atual"
         value={balance}

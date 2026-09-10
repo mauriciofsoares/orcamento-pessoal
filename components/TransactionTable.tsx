@@ -270,7 +270,7 @@ function TransactionCard({
 
   return (
     <article
-      className={`rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/50 ${
+      className={`rounded-xl border border-[#334155] bg-[#172033] p-4 ${
         isDeleting ? "opacity-50" : ""
       }`}
     >
@@ -285,9 +285,9 @@ function TransactionCard({
             />
             <h3
               className={`min-w-0 break-words text-sm font-semibold ${
-                transaction.isPaid
-                  ? "text-slate-500 line-through"
-                  : "text-slate-950 dark:text-slate-100"
+                  transaction.isPaid
+                    ? "text-[#64748B] line-through"
+                    : "text-[#F8FAFC]"
               }`}
             >
               {transaction.title}
@@ -302,10 +302,10 @@ function TransactionCard({
         <p
           className={`shrink-0 text-right text-base font-semibold tabular-nums ${
             transaction.isPaid
-              ? "text-slate-500 line-through opacity-80"
+              ? "text-[#64748B] line-through opacity-80"
               : isIncome
                 ? "text-emerald-400"
-                : "text-slate-950 dark:text-slate-100"
+                : "text-[#F8FAFC]"
           }`}
         >
           {formatCurrency(transaction.amount)}
@@ -314,20 +314,20 @@ function TransactionCard({
 
       <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">
         <div>
-          <dt className="text-slate-500 dark:text-slate-500">Método</dt>
-          <dd className="mt-1 font-medium text-slate-700 dark:text-slate-300">
+          <dt className="text-[#64748B]">Método</dt>
+          <dd className="mt-1 font-medium text-[#94A3B8]">
             {transaction.paymentMethod}
           </dd>
         </div>
         <div>
-          <dt className="text-slate-500 dark:text-slate-500">Vencimento</dt>
-          <dd className="mt-1 font-medium tabular-nums text-slate-700 dark:text-slate-300">
+          <dt className="text-[#64748B]">Vencimento</dt>
+          <dd className="mt-1 font-medium tabular-nums text-[#94A3B8]">
             {formatDate(transaction.dueDate)}
           </dd>
         </div>
       </dl>
 
-      <div className="mt-4 border-t border-slate-200 pt-3 dark:border-slate-800">
+      <div className="mt-4 border-t border-[#334155] pt-3">
         <TransactionActions
           transaction={transaction}
           onRequestDelete={onRequestDelete}
@@ -391,10 +391,10 @@ export function TransactionTable({
     : [{ label: "Excluir", onClick: () => runDelete("single") }];
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-[#334155] bg-[#1E293B] md:flex md:min-h-0 md:flex-1 md:flex-col">
-      <header className="flex shrink-0 flex-col gap-3 border-b border-[#334155] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="overflow-hidden md:flex md:min-h-0 md:flex-1 md:flex-col md:rounded-2xl md:border md:border-[#334155] md:bg-[#1E293B]">
+      <header className="flex shrink-0 flex-col gap-3 pb-3 md:border-b md:border-[#334155] md:px-5 md:py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="font-outfit text-xl font-semibold text-[#F8FAFC]">Lançamentos</h2>
+          <h2 className="font-outfit text-xl font-bold text-[#F8FAFC]">Lançamentos</h2>
           <p className="text-xs text-[#64748B]">
             {transactions.length} registro(s) no período
           </p>
@@ -414,7 +414,7 @@ export function TransactionTable({
         </div>
       ) : (
         <>
-          <div className="flex flex-col gap-3 p-3 md:hidden">
+          <div className="flex flex-col gap-2.5 md:hidden">
             {transactions.map((transaction) => (
               <TransactionCard
                 key={transaction.id}

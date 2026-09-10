@@ -23,16 +23,16 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
   return (
     <main className="w-full px-4 py-7 sm:px-8 md:flex md:min-h-0 md:flex-1 md:flex-col md:overflow-hidden lg:px-10">
-      <header className="mb-7 flex shrink-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <header className="mb-6 flex shrink-0 flex-col gap-5 lg:mb-7 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="font-outfit text-3xl font-bold text-[#F8FAFC] sm:text-[40px]">
+          <h1 className="font-outfit text-[30px] font-bold text-[#F8FAFC] sm:text-[40px]">
             Orçamento pessoal
           </h1>
           <p className="mt-1 text-sm text-[#94A3B8]">
             {MONTH_NAMES[month - 1]} de {year}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+        <div className="grid w-full grid-cols-2 gap-2 lg:flex lg:w-auto lg:flex-wrap lg:items-center lg:gap-3 lg:justify-end">
           <AiImportButton />
           <ImportSheetButton />
           <TransactionForm />

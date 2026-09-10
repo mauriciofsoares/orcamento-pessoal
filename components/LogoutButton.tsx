@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Loader2, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-export function LogoutButton() {
+export function LogoutButton({ inMenu = false }: { inMenu?: boolean }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,12 +37,16 @@ export function LogoutButton() {
   }
 
   return (
-    <div className="inline-flex flex-col gap-2">
+    <div className={inMenu ? "flex w-full flex-col gap-2" : "inline-flex flex-col gap-2"}>
       <button
         type="button"
         onClick={handleLogout}
         disabled={isLoading}
-        className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-[#334155] px-3.5 text-sm font-bold text-[#F8FAFC] transition-colors hover:border-[#475569] hover:bg-[#1E293B] disabled:cursor-not-allowed disabled:opacity-60"
+        className={
+          inMenu
+            ? "flex h-[52px] w-full items-center gap-3.5 rounded-lg px-4 text-base font-medium text-[#F87171] transition-colors hover:bg-[#F87171]/10 disabled:cursor-not-allowed disabled:opacity-60"
+            : "inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-[#334155] px-3.5 text-sm font-bold text-[#F8FAFC] transition-colors hover:border-[#475569] hover:bg-[#1E293B] disabled:cursor-not-allowed disabled:opacity-60"
+        }
       >
         {isLoading ? (
           <Loader2 className="size-4 animate-spin" aria-hidden />

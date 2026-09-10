@@ -136,8 +136,9 @@ function CumulativeTimeline({
         Como o caixa evolui carregando o resultado de cada mês.
       </p>
 
-      <div className="group/chart mt-6 flex h-[194px] items-end gap-2 overflow-x-auto md:overflow-visible">
-        {projections.map((item) => {
+      <div className="mt-6 w-full overflow-x-auto pb-2 xl:overflow-visible">
+        <div className="group/chart flex h-[194px] min-w-[960px] items-end gap-2 xl:min-w-0">
+          {projections.map((item) => {
           const barHeight = Math.max(
             (Math.abs(item.cumulative) / peak) * 132,
             item.cumulative === 0 ? 2 : 8,
@@ -151,7 +152,7 @@ function CumulativeTimeline({
             >
               <div className="relative flex h-[170px] w-full items-end justify-center">
                 <div
-                  className="pointer-events-none absolute left-1/2 z-10 hidden w-max -translate-x-1/2 rounded-lg border border-[#334155] bg-[#172033] px-3 py-2 text-center text-xs shadow-[0_10px_24px_rgba(0,0,0,0.3)] group-hover/bar:block"
+                  className="pointer-events-none absolute left-1/2 z-10 hidden w-max -translate-x-1/2 rounded-lg border border-[#334155] bg-[#172033] px-3 py-2 text-center text-xs shadow-[0_10px_24px_rgba(0,0,0,0.3)] xl:group-hover/bar:block"
                   style={{ bottom: `${barHeight + 36}px` }}
                 >
                   <p className="font-semibold text-[#F8FAFC]">
@@ -183,7 +184,8 @@ function CumulativeTimeline({
               </span>
             </div>
           );
-        })}
+          })}
+        </div>
       </div>
     </section>
   );
