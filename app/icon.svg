@@ -1,0 +1,28 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" fill="#1E1E1E"/>
+<g id="favicons-saldo-seguro">
+<rect width="1440" height="1122" transform="translate(-96 -248)" fill="#0F172A"/>
+<g id="workspace-grid">
+<g id="hero-column">
+<rect x="-31.5" y="-31.5" width="575" height="841" rx="23.5" fill="#1E293B"/>
+<rect x="-31.5" y="-31.5" width="575" height="841" rx="23.5" stroke="#334155"/>
+<g id="hero-preview">
+<rect width="576" height="576" transform="translate(-32 -32)" fill="#0B1329"/>
+<g id="hero-target-asset">
+<g id="logo-container-512">
+<rect width="512" height="512" rx="113" fill="#10B981"/>
+<g id="bars-wrapper">
+<path id="bar-1" d="M128.5 291.5C128.5 274.655 142.155 261 159 261C175.845 261 189.5 274.655 189.5 291.5V369C189.5 377.284 182.784 384 174.5 384H143.5C135.216 384 128.5 377.284 128.5 369V291.5Z" fill="white"/>
+<path id="bar-2" d="M225.5 225.5C225.5 208.655 239.155 195 256 195C272.845 195 286.5 208.655 286.5 225.5V369C286.5 377.284 279.784 384 271.5 384H240.5C232.216 384 225.5 377.284 225.5 369V225.5Z" fill="white"/>
+<path id="bar-3" d="M322.5 158.5C322.5 141.655 336.155 128 353 128C369.845 128 383.5 141.655 383.5 158.5V369C383.5 377.284 376.784 384 368.5 384H337.5C329.216 384 322.5 377.284 322.5 369V158.5Z" fill="white"/>
+<g id="trending-up">
+<path id="Vector" d="M362.675 266.665V202.675H298.67M362.675 202.675L272.001 293.327L218.664 240.003L149.325 309.325" stroke="#0F172A" stroke-width="12.8" stroke-linecap="round"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</svg>
