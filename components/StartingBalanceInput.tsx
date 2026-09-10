@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Wallet } from "lucide-react";
 import { parseCurrencyInput } from "@/lib/format";
 
 const STORAGE_KEY = "orcamento:starting-balance";
@@ -63,27 +62,22 @@ export function StartingBalanceInput({ value }: { value: number }) {
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 dark:shadow-none">
+    <section className="rounded-2xl border border-[#334155] bg-[#172033] p-5 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)]">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3">
-          <span className="rounded-xl bg-emerald-500/10 p-2.5 text-emerald-400">
-            <Wallet className="size-5" aria-hidden />
-          </span>
-          <div>
+        <div>
             <label
               htmlFor="starting-balance"
-              className="text-sm font-semibold text-slate-900 dark:text-slate-200"
+              className="font-outfit text-base font-semibold text-[#F8FAFC]"
             >
               Saldo inicial
             </label>
-            <p className="text-xs text-slate-500 dark:text-slate-500">
+            <p className="mt-1 text-sm text-[#94A3B8]">
               Quanto você tem em conta hoje. A projeção acumula a partir daqui.
             </p>
-          </div>
         </div>
 
-        <div className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 focus-within:border-emerald-500 dark:border-slate-700 dark:bg-slate-950">
-          <span className="text-sm text-slate-500 dark:text-slate-500">R$</span>
+        <div className="flex w-full items-center gap-2 rounded-[10px] border border-[#334155] bg-[#0B1220] px-4 py-3 focus-within:border-[#10B981] sm:w-[220px]">
+          <span className="text-xs text-[#94A3B8]">R$</span>
           <input
             ref={inputRef}
             id="starting-balance"
@@ -92,7 +86,7 @@ export function StartingBalanceInput({ value }: { value: number }) {
             defaultValue={toInputText(value)}
             onChange={handleChange}
             placeholder="0,00"
-            className="w-32 bg-transparent text-right text-sm tabular-nums text-slate-950 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-600"
+            className="min-w-0 flex-1 bg-transparent text-right text-xs tabular-nums text-[#F8FAFC] outline-none placeholder:text-[#64748B]"
           />
         </div>
       </div>

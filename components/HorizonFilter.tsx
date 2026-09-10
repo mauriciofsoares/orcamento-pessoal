@@ -22,7 +22,7 @@ export function HorizonFilter({
 
   return (
     <div
-      className={`flex items-center gap-1 rounded-lg border border-slate-200 bg-white/70 p-1 dark:border-slate-800 dark:bg-transparent ${
+      className={`flex items-center gap-1 rounded-[10px] border border-[#334155] bg-[#0B1220] p-1 ${
         isPending ? "opacity-60" : ""
       }`}
       aria-busy={isPending}
@@ -32,10 +32,10 @@ export function HorizonFilter({
           key={option}
           type="button"
           onClick={() => selectHorizon(option)}
-          className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
+          className={`rounded-lg px-4 py-2.5 text-sm transition-colors ${
             months === option
-              ? "bg-slate-100 text-slate-950 dark:bg-slate-800 dark:text-slate-100"
-              : "text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-slate-200"
+              ? "bg-[#10B981] font-bold text-[#F8FAFC] shadow-[0_6px_14px_-6px_rgba(16,185,129,0.2)]"
+              : "font-medium text-[#94A3B8] hover:text-[#F8FAFC]"
           }`}
         >
           {option} meses
