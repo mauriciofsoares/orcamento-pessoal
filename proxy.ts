@@ -7,6 +7,7 @@ export function isPublicPath(pathname: string) {
   return (
     pathname.startsWith("/_next/static") ||
     pathname.startsWith("/_next/image") ||
+    pathname.startsWith("/login-assets/") ||
     pathname === "/manifest.webmanifest" ||
     pathname === "/sw.js" ||
     pathname === "/favicon.ico" ||

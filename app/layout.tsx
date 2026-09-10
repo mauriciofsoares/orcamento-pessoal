@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { User } from "@supabase/supabase-js";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import { Toaster } from "sonner";
 import { MainNav } from "@/components/MainNav";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
@@ -15,6 +15,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Usada pela tela de login (marca "Saldo Seguro"), conforme design do Figma.
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  weight: ["600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -65,9 +72,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="pt-BR"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} dark h-full overflow-hidden antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="h-full flex flex-col overflow-hidden">
         <ServiceWorkerRegister />
         <MainNav user={user} />
         {children}

@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Loader2, LogIn, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { buildAuthCallbackUrl, safeNextPath } from "@/lib/safe-next-path";
 
-const fieldClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-400 focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-600";
-const labelClass = "mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error
@@ -22,9 +20,12 @@ export function LoginForm({ initialError = null }: { initialError?: string | nul
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(initialError);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const isBusy = isLoading || isGoogleLoading;
 
   // Nunca confiar cegamente no valor da URL: sempre passar por safeNextPath antes de usar.
   const destination = safeNextPath(searchParams.get("next"));
@@ -32,6 +33,14 @@ export function LoginForm({ initialError = null }: { initialError?: string | nul
   async function handleEmailLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+
+    // Validação leve de formato antes de gastar uma chamada de rede, sem expor
+    // se o e-mail existe ou não (isso é responsabilidade exclusiva do Supabase).
+    if (!EMAIL_PATTERN.test(email)) {
+      setEmailError("E-mail inválido");
+      return;
+    }
+    setEmailError(null);
     setIsLoading(true);
 
     try {
@@ -42,7 +51,8 @@ export function LoginForm({ initialError = null }: { initialError?: string | nul
       });
 
       if (signInError) {
-        setError(signInError.message);
+        // Mensagem genérica: nunca revelar se o e-mail existe ou se foi a senha que errou.
+        setError("E-mail ou senha incorretos.");
         return;
       }
 
@@ -81,23 +91,39 @@ export function LoginForm({ initialError = null }: { initialError?: string | nul
   }
 
   return (
-    <main className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md items-center px-4 py-10">
-      <section className="w-full rounded-2xl border border-slate-200 bg-white/80 p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900/80">
-        <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex size-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400">
-            <Sparkles className="size-5" aria-hidden />
+    <main className="relative flex min-h-dvh w-full items-center justify-center overflow-hidden bg-[#08101F] px-4 py-10">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 size-[700px] -translate-x-1/2 -translate-y-1/2"
+      >
+        <div className="absolute inset-[-20%]">
+          <img alt="" className="block size-full max-w-none" src="/login-assets/ambient-glow.svg" />
+        </div>
+      </div>
+
+      <section className="relative w-full max-w-[520px] rounded-[24px] border border-[#334155] bg-[#172033] p-10 shadow-[0_16px_48px_0_rgba(0,0,0,0.25)] [@media(max-height:850px)]:p-6">
+        <div className="mb-6 flex flex-col items-center gap-3 text-center [@media(max-height:850px)]:mb-4 [@media(max-height:850px)]:gap-2">
+          <div className="flex size-16 items-center justify-center rounded-2xl bg-[#10B981] [@media(max-height:850px)]:size-14">
+            <img
+              alt=""
+              className="block h-[37.12px] w-[37.12px] max-w-none"
+              src="/login-assets/growth-chart.svg"
+            />
           </div>
-          <h1 className="text-xl font-semibold text-slate-950 dark:text-slate-100">
-            Entre na sua conta
-          </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Acesse seu orçamento pessoal com segurança.
-          </p>
+          <p className="font-outfit text-2xl font-bold text-[#F8FAFC] [@media(max-height:850px)]:text-xl">Saldo Seguro</p>
+          <p className="text-xs font-medium text-[#10B981]">FINANÇAS PESSOAIS</p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleEmailLogin}>
-          <div>
-            <label className={labelClass} htmlFor="email">
+        <div className="mb-6 flex flex-col items-center gap-3 text-center [@media(max-height:850px)]:mb-4 [@media(max-height:850px)]:gap-2">
+          <h1 className="font-outfit text-[28px] font-semibold text-[#F8FAFC] [@media(max-height:850px)]:text-2xl">
+            Entre na sua conta
+          </h1>
+          <p className="text-base text-[#94A3B8] [@media(max-height:850px)]:text-sm">Tenha clareza sobre o seu dinheiro.</p>
+        </div>
+
+        <form className="flex flex-col gap-5 [@media(max-height:850px)]:gap-4" onSubmit={handleEmailLogin} noValidate>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-[#94A3B8]" htmlFor="email">
               E-mail
             </label>
             <input
@@ -105,72 +131,109 @@ export function LoginForm({ initialError = null }: { initialError?: string | nul
               type="email"
               autoComplete="email"
               required
-              className={fieldClass}
+              disabled={isBusy}
+              aria-invalid={emailError ? true : undefined}
+              aria-describedby={emailError ? "email-error" : undefined}
+              className="h-12 w-full rounded-lg border bg-[#020617] px-4 text-sm text-[#F8FAFC] outline-none transition-colors placeholder:text-[#64748B] disabled:opacity-50 border-[#334155] focus:border-[#10B981] aria-invalid:border-[#F87171]"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(event) => {
+                setEmail(event.target.value);
+                if (emailError) setEmailError(null);
+              }}
               placeholder="voce@email.com"
             />
+            {emailError && (
+              <p id="email-error" className="text-xs text-[#F87171]">
+                {emailError}
+              </p>
+            )}
           </div>
 
-          <div>
-            <label className={labelClass} htmlFor="password">
-              Senha
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              className={fieldClass}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="Sua senha"
-            />
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-semibold text-[#94A3B8]" htmlFor="password">
+                Senha
+              </label>
+              <Link
+                className="text-[13px] font-semibold text-[#10B981] hover:underline"
+                href="/login"
+              >
+                Esqueci minha senha
+              </Link>
+            </div>
+            <div className="flex h-12 w-full items-center gap-3 rounded-lg border border-[#334155] bg-[#020617] px-4 transition-colors focus-within:border-[#10B981] has-[input:disabled]:opacity-50">
+              <input
+                id="password"
+                type={isPasswordVisible ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                disabled={isBusy}
+                className="min-w-0 flex-1 bg-transparent text-sm text-[#F8FAFC] outline-none placeholder:text-[#64748B]"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Sua senha"
+              />
+              <button
+                type="button"
+                onClick={() => setIsPasswordVisible((visible) => !visible)}
+                disabled={isBusy}
+                aria-label={isPasswordVisible ? "Ocultar senha" : "Mostrar senha"}
+                className="shrink-0 text-[#64748B] transition-colors hover:text-[#94A3B8] disabled:opacity-50"
+              >
+                {isPasswordVisible ? (
+                  <EyeOff className="size-[18px]" aria-hidden />
+                ) : (
+                  <Eye className="size-[18px]" aria-hidden />
+                )}
+              </button>
+            </div>
           </div>
 
-          {error && (
-            <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-700 dark:text-rose-300">
-              {error}
-            </p>
-          )}
+          <div aria-live="polite">
+            {error && (
+              <p className="text-xs text-[#F87171]">{error}</p>
+            )}
+          </div>
 
           <button
             type="submit"
-            disabled={isLoading || isGoogleLoading}
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={isBusy}
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#10B981] text-sm font-bold text-[#020617] transition-colors hover:bg-[#34D399] active:bg-[#059669] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_rgba(255,255,255,0.25),0_0_0_2px_rgba(16,185,129,0.4)]"
           >
             {isLoading ? (
-              <Loader2 className="size-4 animate-spin" aria-hidden />
+              <>
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+                Entrando...
+              </>
             ) : (
-              <LogIn className="size-4" aria-hidden />
+              "Entrar"
             )}
-            Entrar
           </button>
         </form>
 
-        <div className="my-5 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-500">
-          <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-          ou
-          <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+        <div className="my-4 flex items-center gap-4 [@media(max-height:850px)]:my-3">
+          <div className="h-px flex-1 bg-[#334155]" />
+          <span className="text-xs text-[#94A3B8]">ou</span>
+          <div className="h-px flex-1 bg-[#334155]" />
         </div>
 
         <button
           type="button"
           onClick={handleGoogleLogin}
-          disabled={isLoading || isGoogleLoading}
-          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+          disabled={isBusy}
+          className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-lg border border-[#334155] bg-transparent text-sm font-semibold text-[#F8FAFC] transition-colors hover:border-[#475569] hover:bg-white/[0.03] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isGoogleLoading ? (
-            <Loader2 className="size-4 animate-spin" aria-hidden />
+            <Loader2 className="size-[18px] animate-spin" aria-hidden />
           ) : (
-            <Sparkles className="size-4" aria-hidden />
+            <img alt="" className="size-[18px]" src="/login-assets/google-icon.png" />
           )}
           Continuar com Google
         </button>
 
-        <p className="mt-5 text-center text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-5 text-center text-sm text-[#94A3B8] [@media(max-height:850px)]:mt-4">
           Não possui conta?{" "}
-          <Link className="font-medium text-emerald-500 hover:text-emerald-400" href="/signup">
+          <Link className="font-semibold text-[#10B981] hover:underline" href="/signup">
             Cadastre-se
           </Link>
         </p>

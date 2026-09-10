@@ -29,8 +29,9 @@ describe("LoginForm - contrato de comportamento (login email/senha)", () => {
     expect(loginFormSource).toContain("router.refresh()");
   });
 
-  it("exibe a mensagem de erro retornada pelo Supabase em vez de falhar silenciosamente", () => {
-    expect(loginFormSource).toContain("setError(signInError.message)");
+  it("exibe mensagem genérica de erro de credenciais, sem revelar se o e-mail existe (design Figma)", () => {
+    expect(loginFormSource).toContain('setError("E-mail ou senha incorretos.")');
+    expect(loginFormSource).not.toContain("setError(signInError.message)");
   });
 });
 
