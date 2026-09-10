@@ -27,11 +27,11 @@ export default async function ProjectionPage({ searchParams }: PageProps<"/proje
   );
 
   return (
-    <main className="w-full px-4 py-8 sm:px-8 lg:px-10 lg:py-8 md:min-h-0 md:flex-1 md:overflow-y-auto md:[scrollbar-color:#475569_#172033] md:[scrollbar-width:thin] md:[&::-webkit-scrollbar]:w-2 md:[&::-webkit-scrollbar-thumb]:rounded-full md:[&::-webkit-scrollbar-thumb]:bg-[#475569] md:[&::-webkit-scrollbar-thumb:hover]:bg-[#64748B] md:[&::-webkit-scrollbar-track]:bg-[#172033]">
-      <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <main className="w-full px-4 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-8 md:min-h-0 md:flex-1 md:overflow-y-auto md:[scrollbar-color:#475569_#172033] md:[scrollbar-width:thin] md:[&::-webkit-scrollbar]:w-2 md:[&::-webkit-scrollbar-thumb]:rounded-full md:[&::-webkit-scrollbar-thumb]:bg-[#475569] md:[&::-webkit-scrollbar-thumb:hover]:bg-[#64748B] md:[&::-webkit-scrollbar-track]:bg-[#172033]">
+      <header className="mb-6 flex flex-col gap-[18px] sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-outfit text-3xl font-bold text-[#F8FAFC] sm:text-[40px]">Projeção</h1>
-          <p className="mt-1 text-sm text-[#94A3B8]">
+          <p className="mt-1 text-sm leading-[1.4] text-[#94A3B8]">
             Próximos {months} meses a partir do mês atual
           </p>
         </div>
@@ -44,38 +44,38 @@ export default async function ProjectionPage({ searchParams }: PageProps<"/proje
         </p>
       )}
 
-      <section className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="min-h-[120px] rounded-2xl border border-[#334155] bg-[#172033] p-5 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)]">
-          <p className="text-xs font-semibold uppercase text-[#94A3B8]">
+      <section className="mb-4 grid grid-cols-1 gap-2.5 sm:gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-[#334155] bg-[#172033] p-4 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)] sm:min-h-[120px] sm:p-5">
+          <p className="text-[10px] font-semibold uppercase text-[#94A3B8] sm:text-xs">
             Receitas previstas
           </p>
-          <p className="mt-2 font-outfit text-[26px] font-bold tabular-nums text-[#34D399]">
+          <p className="mt-2 font-outfit text-2xl font-bold tabular-nums text-[#34D399] sm:text-[26px]">
             {formatCurrency(totalIncome)}
           </p>
         </div>
-        <div className="min-h-[120px] rounded-2xl border border-[#334155] bg-[#172033] p-5 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)]">
-          <p className="text-xs font-semibold uppercase text-[#94A3B8]">
+        <div className="rounded-2xl border border-[#334155] bg-[#172033] p-4 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)] sm:min-h-[120px] sm:p-5">
+          <p className="text-[10px] font-semibold uppercase text-[#94A3B8] sm:text-xs">
             Despesas previstas
           </p>
-          <p className="mt-2 font-outfit text-[26px] font-bold tabular-nums text-[#F87171]">
+          <p className="mt-2 font-outfit text-2xl font-bold tabular-nums text-[#F87171] sm:text-[26px]">
             {formatCurrency(totalExpenses)}
           </p>
         </div>
         <div
-          className="min-h-[120px] rounded-2xl border border-[#334155] bg-[#172033] p-5 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)]"
+          className="rounded-2xl border border-[#334155] bg-[#172033] p-4 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)] sm:min-h-[120px] sm:p-5"
         >
-          <p className="text-xs font-semibold uppercase text-[#94A3B8]">
+          <p className="text-[10px] font-semibold uppercase text-[#94A3B8] sm:text-xs">
             Saldo ao fim do período
           </p>
           <p
-            className={`mt-2 font-outfit text-[26px] font-bold tabular-nums ${
+            className={`mt-2 font-outfit text-2xl font-bold tabular-nums sm:text-[26px] ${
               finalBalance < 0 ? "text-[#F87171]" : "text-[#34D399]"
             }`}
           >
             {formatCurrency(finalBalance)}
           </p>
           {worstMonth && worstMonth.net < 0 && (
-            <p className="mt-2 text-xs text-[#94A3B8]">
+            <p className="mt-2 text-[11px] text-[#94A3B8] sm:text-xs">
               Mês mais apertado: {worstMonth.month}/{worstMonth.year} (
               {formatCurrency(worstMonth.net)})
             </p>

@@ -22,7 +22,7 @@ export function HorizonFilter({
 
   return (
     <div
-      className={`flex items-center gap-1 rounded-[10px] border border-[#334155] bg-[#0B1220] p-1 ${
+      className={`flex w-full items-center gap-1 rounded-[10px] border border-[#334155] bg-[#0B1220] p-1 sm:w-auto ${
         isPending ? "opacity-60" : ""
       }`}
       aria-busy={isPending}
@@ -32,7 +32,7 @@ export function HorizonFilter({
           key={option}
           type="button"
           onClick={() => selectHorizon(option)}
-          className={`rounded-lg px-4 py-2.5 text-sm transition-colors ${
+          className={`h-[38px] flex-1 rounded-lg px-2 text-[13px] transition-colors sm:h-auto sm:flex-none sm:px-4 sm:py-2.5 sm:text-sm ${
             months === option
               ? "bg-[#10B981] font-bold text-[#F8FAFC] shadow-[0_6px_14px_-6px_rgba(16,185,129,0.2)]"
               : "font-medium text-[#94A3B8] hover:text-[#F8FAFC]"

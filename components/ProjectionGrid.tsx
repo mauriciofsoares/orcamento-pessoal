@@ -28,14 +28,14 @@ function MonthCard({
 
   return (
     <article
-      className={`rounded-2xl border bg-[#172033] p-3.5 ${
+      className={`rounded-2xl border bg-[#172033] p-4 sm:p-3.5 ${
         isCurrent
           ? "border-[#10B981]"
           : "border-[#334155]"
       }`}
     >
       <header className="flex items-baseline justify-between gap-2">
-        <h3 className="font-outfit text-sm font-semibold text-[#F8FAFC]">
+        <h3 className="font-outfit text-lg font-semibold text-[#F8FAFC] sm:text-sm">
           {MONTH_NAMES[projection.month - 1]}
           <span className="ml-1 text-xs font-normal text-[#F8FAFC]">
             {projection.year}
@@ -48,7 +48,7 @@ function MonthCard({
         )}
       </header>
 
-      <div className="mt-4">
+      <div className="mt-3 sm:mt-4">
         <div className="flex items-baseline justify-between text-xs">
           <span className="text-[#94A3B8]">Comprometido</span>
           <span
@@ -67,7 +67,7 @@ function MonthCard({
         </div>
       </div>
 
-      <dl className="mt-4 space-y-1.5 text-xs">
+      <dl className="mt-3 space-y-2 text-xs sm:mt-4 sm:space-y-1.5">
         <div className="flex justify-between">
           <dt className="text-[#94A3B8]">Receitas</dt>
           <dd className="tabular-nums text-[#10B981]">
@@ -128,16 +128,16 @@ function CumulativeTimeline({
   );
 
   return (
-    <section className="rounded-2xl border border-[#334155] bg-[#172033] p-6 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)]">
-      <h2 className="font-outfit text-xl font-semibold text-[#F8FAFC]">
+    <section className="rounded-2xl border border-[#334155] bg-[#172033] p-4 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)] sm:p-6">
+      <h2 className="font-outfit text-[19px] font-semibold text-[#F8FAFC] sm:text-xl">
         Saldo acumulado projetado
       </h2>
-      <p className="mt-1 text-sm text-[#94A3B8]">
+      <p className="mt-1 text-xs leading-[1.4] text-[#94A3B8] sm:text-sm">
         Como o caixa evolui carregando o resultado de cada mês.
       </p>
 
-      <div className="mt-6 w-full overflow-x-auto pb-2 xl:overflow-visible">
-        <div className="group/chart flex h-[194px] min-w-[960px] items-end gap-2 xl:min-w-0">
+      <div className="mt-4 w-full overflow-hidden sm:mt-6 xl:overflow-visible">
+        <div className="group/chart flex h-[154px] min-w-0 items-end gap-1 sm:h-[194px] sm:gap-2 xl:min-w-0">
           {projections.map((item) => {
           const barHeight = Math.max(
             (Math.abs(item.cumulative) / peak) * 132,
@@ -148,9 +148,9 @@ function CumulativeTimeline({
           return (
             <div
               key={`${item.year}-${item.month}`}
-              className="group/bar flex min-w-10 flex-1 flex-col items-center gap-2"
+              className="group/bar flex min-w-0 flex-1 flex-col items-center gap-1.5 sm:min-w-10 sm:gap-2"
             >
-              <div className="relative flex h-[170px] w-full items-end justify-center">
+              <div className="relative flex h-[132px] w-full items-end justify-center sm:h-[170px]">
                 <div
                   className="pointer-events-none absolute left-1/2 z-10 hidden w-max -translate-x-1/2 rounded-lg border border-[#334155] bg-[#172033] px-3 py-2 text-center text-xs shadow-[0_10px_24px_rgba(0,0,0,0.3)] xl:group-hover/bar:block"
                   style={{ bottom: `${barHeight + 36}px` }}
@@ -163,7 +163,7 @@ function CumulativeTimeline({
                   </p>
                 </div>
                 <span
-                  className={`pointer-events-none absolute left-1/2 z-10 w-max -translate-x-1/2 text-[10px] font-medium tabular-nums sm:text-xs ${
+                  className={`pointer-events-none absolute left-1/2 z-10 w-max -translate-x-1/2 origin-bottom scale-x-[0.42] text-[10px] font-semibold tabular-nums sm:scale-x-100 sm:text-xs ${
                     isNegative ? "text-[#F87171]/70" : "text-[#10B981]/70"
                   }`}
                     style={{ bottom: `${barHeight + 8}px` }}
@@ -179,7 +179,7 @@ function CumulativeTimeline({
                   style={{ height: `${barHeight}px` }}
                 />
               </div>
-              <span className="text-xs uppercase text-[#94A3B8]">
+              <span className="text-[8px] uppercase text-[#94A3B8] sm:text-xs">
                 {MONTH_NAMES[item.month - 1].slice(0, 3)}
               </span>
             </div>
@@ -223,7 +223,10 @@ export function ProjectionGrid({
       <StartingBalanceInput value={startingBalance} />
       <CumulativeTimeline projections={projections} />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <h2 className="font-outfit text-[22px] font-bold text-[#F8FAFC] sm:hidden">
+        Detalhamento mensal
+      </h2>
+      <div className="space-y-3 sm:grid sm:grid-cols-2 sm:gap-3 sm:space-y-0 lg:grid-cols-3 xl:grid-cols-4">
         {projections.map((projection) => (
           <MonthCard
             key={`${projection.year}-${projection.month}`}

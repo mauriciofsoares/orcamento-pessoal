@@ -62,8 +62,8 @@ export function StartingBalanceInput({ value }: { value: number }) {
   }
 
   return (
-    <section className="rounded-2xl border border-[#334155] bg-[#172033] p-5 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)]">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="rounded-2xl border border-[#334155] bg-[#172033] p-4 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.15)] sm:p-5">
+      <div className="flex flex-col gap-3.5 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <label
               htmlFor="starting-balance"
@@ -71,7 +71,7 @@ export function StartingBalanceInput({ value }: { value: number }) {
             >
               Saldo inicial
             </label>
-            <p className="mt-1 text-sm text-[#94A3B8]">
+            <p className="mt-1 text-[13px] leading-[1.4] text-[#94A3B8] sm:text-sm">
               Quanto você tem em conta hoje. A projeção acumula a partir daqui.
             </p>
         </div>
