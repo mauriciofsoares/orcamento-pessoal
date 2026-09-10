@@ -27,7 +27,7 @@ export default async function ProjectionPage({ searchParams }: PageProps<"/proje
   );
 
   return (
-    <main className="w-full px-4 py-8 sm:px-8 lg:px-10 lg:py-8 md:min-h-0 md:flex-1 md:overflow-y-auto">
+    <main className="w-full px-4 py-8 sm:px-8 lg:px-10 lg:py-8 md:min-h-0 md:flex-1 md:overflow-y-auto md:[scrollbar-color:#475569_#172033] md:[scrollbar-width:thin] md:[&::-webkit-scrollbar]:w-2 md:[&::-webkit-scrollbar-thumb]:rounded-full md:[&::-webkit-scrollbar-thumb]:bg-[#475569] md:[&::-webkit-scrollbar-thumb:hover]:bg-[#64748B] md:[&::-webkit-scrollbar-track]:bg-[#172033]">
       <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-outfit text-3xl font-bold text-[#F8FAFC] sm:text-[40px]">Projeção</h1>
