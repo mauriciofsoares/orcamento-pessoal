@@ -1,14 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { safeNextPath } from "@/lib/safe-next-path";
 
-export function safeNextPath(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) {
-    return "/";
-  }
-
-  return value;
-}
+export { safeNextPath };
 
 function getConfiguredOrigin() {
   const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;

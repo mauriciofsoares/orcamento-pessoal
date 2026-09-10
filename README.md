@@ -21,7 +21,7 @@ npm install
 
 2. Copie `.env.example` para `.env` e preencha os valores do ambiente local.
 
-As variáveis `NEXT_PUBLIC_*` são valores públicos de runtime. Chaves do Groq, senha do app, URLs de banco e chaves administrativas Supabase devem permanecer server-side e nunca devem ser commitadas.
+As variáveis `NEXT_PUBLIC_*` são valores públicos de runtime. Chaves do Groq, URLs de banco e chaves administrativas Supabase devem permanecer server-side e nunca devem ser commitadas.
 
 3. Suba o PostgreSQL local:
 
@@ -48,7 +48,7 @@ A aplicação local fica em `http://localhost:3000`.
 
 ## Autenticação
 
-O portal usa Supabase Auth. O callback local é `/auth/callback`; configure os Redirect URLs no projeto Supabase e no provedor Google conforme o ambiente. O Basic Auth permanece temporariamente como camada adicional para as rotas protegidas.
+O portal usa exclusivamente Supabase Auth (e-mail/senha e Google OAuth) como barreira de acesso. O callback local é `/auth/callback`; configure os Redirect URLs no projeto Supabase e no provedor Google conforme o ambiente. Requisições sem sessão Supabase válida são redirecionadas para `/login`; usuário autenticado em `/login` ou `/signup` é redirecionado para `/`.
 
 ## Testes e validação
 

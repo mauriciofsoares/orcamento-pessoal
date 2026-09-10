@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { USER_A } from "../fixtures";
+import { USER_A, USER_B } from "../fixtures";
 
 const supabase = vi.hoisted(() => ({
   auth: { getUser: vi.fn() },
@@ -61,6 +61,28 @@ describe("getAuthenticatedUser", () => {
     expect(prisma.user.upsert).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({ where: { id: USER_A.id } }),
+    );
+  });
+
+  it("resolves independent identities for two different sessions without leaking between them", async () => {
+    supabase.auth.getUser.mockResolvedValueOnce({ data: { user: USER_A }, error: null });
+    prisma.user.upsert.mockResolvedValueOnce(USER_A);
+    const resultA = await getAuthenticatedUser();
+
+    supabase.auth.getUser.mockResolvedValueOnce({ data: { user: USER_B }, error: null });
+    prisma.user.upsert.mockResolvedValueOnce(USER_B);
+    const resultB = await getAuthenticatedUser();
+
+    expect(resultA).toEqual(USER_A);
+    expect(resultB).toEqual(USER_B);
+    expect(resultA?.id).not.toBe(resultB?.id);
+    expect(prisma.user.upsert).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ where: { id: USER_A.id } }),
+    );
+    expect(prisma.user.upsert).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ where: { id: USER_B.id } }),
     );
   });
 

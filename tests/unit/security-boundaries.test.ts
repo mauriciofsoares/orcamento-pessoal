@@ -9,6 +9,7 @@ vi.mock("next/server", () => ({
 }));
 
 import { getRequestOrigin, safeNextPath } from "@/app/auth/callback/route";
+import { buildAuthCallbackUrl } from "@/lib/safe-next-path";
 import { isPublicAuthPath, isPublicPath } from "@/proxy";
 
 const serviceWorkerSource = readFileSync("public/sw.js", "utf8");
@@ -115,7 +116,19 @@ describe("proxy public paths", () => {
     },
   );
 
-  it.each(["/auth/callback-extra", "/auth/callback-debug", "/auth/callback/foo", "/api/test", "/admin", "/debug"])(
+  it.each([
+    "/auth/callback-extra",
+    "/auth/callback-debug",
+    "/auth/callback/foo",
+    "/api/test",
+    "/api",
+    "/admin",
+    "/debug",
+    "/",
+    "/dashboard",
+    "/login/foo",
+    "/signup/foo",
+  ])(
     "does not make protected path public: %s",
     (path) => {
       expect(isPublicAuthPath(path)).toBe(false);
@@ -137,4 +150,62 @@ describe("service worker authenticated navigation boundary", () => {
     expect(serviceWorkerSource).not.toContain('caches.match("/")');
     expect(serviceWorkerSource).toContain('event.request.mode === "navigate"');
   });
+
+  it("only precaches the three expected static assets (no /login, /signup or /dashboard)", () => {
+    const match = serviceWorkerSource.match(/OFFLINE_URLS\s*=\s*(\[[^\]]*\])/);
+    expect(match).not.toBeNull();
+
+    const offlineUrls = JSON.parse((match as RegExpMatchArray)[1].replace(/'/g, '"'));
+    expect(offlineUrls).toEqual(["/manifest.webmanifest", "/icon-192.png", "/icon-512.png"]);
+  });
+
+  it("never intercepts non-GET requests, so Server Actions (POST) are not cached", () => {
+    expect(serviceWorkerSource).toContain('event.request.method !== "GET"');
+  });
 });
+
+describe("pos-login/signup: destino via next (LoginForm/SignUpForm usam exatamente esta regra)", () => {
+  it("sem next -> '/'", () => {
+    expect(safeNextPath(null)).toBe("/");
+  });
+
+  it("next valido -> o proprio caminho (login com next=/projection)", () => {
+    expect(safeNextPath("/projection")).toBe("/projection");
+  });
+
+  it("next valido com query string preservada", () => {
+    expect(safeNextPath("/projection?month=2026-09")).toBe("/projection?month=2026-09");
+  });
+
+  it.each([
+    "https://evil.example",
+    "http://evil.example",
+    "//evil.example",
+    "\\\\evil.example",
+    "/\\evil.example",
+  ])("next malicioso (%s) -> '/'", (maliciousNext) => {
+    expect(safeNextPath(maliciousNext)).toBe("/");
+  });
+
+  it("buildAuthCallbackUrl sem next -> callback sem parametro next", () => {
+    expect(buildAuthCallbackUrl("https://app.example", null)).toBe(
+      "https://app.example/auth/callback",
+    );
+  });
+
+  it("buildAuthCallbackUrl com next valido -> preserva o destino para o Google OAuth/confirmacao por e-mail", () => {
+    expect(buildAuthCallbackUrl("https://app.example", "/projection")).toBe(
+      "https://app.example/auth/callback?next=%2Fprojection",
+    );
+  });
+
+  it.each(["https://evil.example", "//evil.example", "\\\\evil.example"])(
+    "buildAuthCallbackUrl com next malicioso (%s) -> callback sem parametro next (equivalente a '/')",
+    (maliciousNext) => {
+      expect(buildAuthCallbackUrl("https://app.example", maliciousNext)).toBe(
+        "https://app.example/auth/callback",
+      );
+    },
+  );
+});
+

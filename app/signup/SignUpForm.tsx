@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Loader2, LogIn, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { buildAuthCallbackUrl, safeNextPath } from "@/lib/safe-next-path";
 
@@ -14,69 +14,74 @@ const labelClass = "mb-1.5 block text-xs font-medium text-slate-600 dark:text-sl
 function getErrorMessage(error: unknown) {
   return error instanceof Error
     ? error.message
-    : "Não foi possível concluir a autenticação.";
+    : "Não foi possível concluir o cadastro.";
 }
 
-export function LoginForm({ initialError = null }: { initialError?: string | null }) {
+export function SignUpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(initialError);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   // Nunca confiar cegamente no valor da URL: sempre passar por safeNextPath antes de usar.
   const destination = safeNextPath(searchParams.get("next"));
 
-  async function handleEmailLogin(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSignUp(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setMessage(null);
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setError("Informe um e-mail válido.");
+      return;
+    }
+
+    if (!password) {
+      setError("Informe uma senha.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("A confirmação de senha precisa ser igual à senha.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const supabase = createClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      // O destino ja validado (safeNextPath) viaja no emailRedirectTo do proprio site;
+      // o Supabase apenas anexa "code" a essa URL, sem introduzir redirect externo.
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: { name },
+          emailRedirectTo: buildAuthCallbackUrl(window.location.origin, searchParams.get("next")),
+        },
       });
 
-      if (signInError) {
-        setError(signInError.message);
+      if (signUpError) {
+        setError(signUpError.message);
         return;
       }
 
-      router.replace(destination);
-      router.refresh();
+      if (data.session) {
+        router.replace(destination);
+        router.refresh();
+        return;
+      }
+
+      setMessage("Cadastro criado. Confira seu e-mail para confirmar a conta antes de entrar.");
     } catch (error) {
       setError(getErrorMessage(error));
     } finally {
       setIsLoading(false);
-    }
-  }
-
-  async function handleGoogleLogin() {
-    setError(null);
-    setIsGoogleLoading(true);
-
-    try {
-      const supabase = createClient();
-      // O destino ja validado (safeNextPath) viaja no redirectTo do proprio site;
-      // o Supabase apenas anexa "code" a essa URL, sem introduzir redirect externo.
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: buildAuthCallbackUrl(window.location.origin, searchParams.get("next")),
-        },
-      });
-
-      if (oauthError) {
-        setIsGoogleLoading(false);
-        setError(oauthError.message);
-      }
-    } catch (error) {
-      setIsGoogleLoading(false);
-      setError(getErrorMessage(error));
     }
   }
 
@@ -88,14 +93,29 @@ export function LoginForm({ initialError = null }: { initialError?: string | nul
             <Sparkles className="size-5" aria-hidden />
           </div>
           <h1 className="text-xl font-semibold text-slate-950 dark:text-slate-100">
-            Entre na sua conta
+            Crie sua conta
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Acesse seu orçamento pessoal com segurança.
+            Prepare seu orçamento para uma experiência individual.
           </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleEmailLogin}>
+        <form className="space-y-4" onSubmit={handleSignUp}>
+          <div>
+            <label className={labelClass} htmlFor="name">
+              Nome
+            </label>
+            <input
+              id="name"
+              type="text"
+              autoComplete="name"
+              className={fieldClass}
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Seu nome"
+            />
+          </div>
+
           <div>
             <label className={labelClass} htmlFor="email">
               E-mail
@@ -119,12 +139,28 @@ export function LoginForm({ initialError = null }: { initialError?: string | nul
             <input
               id="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               required
               className={fieldClass}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Sua senha"
+              placeholder="Crie uma senha"
+            />
+          </div>
+
+          <div>
+            <label className={labelClass} htmlFor="confirm-password">
+              Confirmar senha
+            </label>
+            <input
+              id="confirm-password"
+              type="password"
+              autoComplete="new-password"
+              required
+              className={fieldClass}
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              placeholder="Repita a senha"
             />
           </div>
 
@@ -134,44 +170,30 @@ export function LoginForm({ initialError = null }: { initialError?: string | nul
             </p>
           )}
 
+          {message && (
+            <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-300">
+              {message}
+            </p>
+          )}
+
           <button
             type="submit"
-            disabled={isLoading || isGoogleLoading}
+            disabled={isLoading}
             className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading ? (
               <Loader2 className="size-4 animate-spin" aria-hidden />
             ) : (
-              <LogIn className="size-4" aria-hidden />
+              <UserPlus className="size-4" aria-hidden />
             )}
-            Entrar
+            Cadastrar
           </button>
         </form>
 
-        <div className="my-5 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-500">
-          <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-          ou
-          <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-        </div>
-
-        <button
-          type="button"
-          onClick={handleGoogleLogin}
-          disabled={isLoading || isGoogleLoading}
-          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-        >
-          {isGoogleLoading ? (
-            <Loader2 className="size-4 animate-spin" aria-hidden />
-          ) : (
-            <Sparkles className="size-4" aria-hidden />
-          )}
-          Continuar com Google
-        </button>
-
         <p className="mt-5 text-center text-sm text-slate-500 dark:text-slate-400">
-          Não possui conta?{" "}
-          <Link className="font-medium text-emerald-500 hover:text-emerald-400" href="/signup">
-            Cadastre-se
+          Já possui uma conta?{" "}
+          <Link className="font-medium text-emerald-500 hover:text-emerald-400" href="/login">
+            Entrar
           </Link>
         </p>
       </section>
