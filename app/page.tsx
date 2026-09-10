@@ -22,8 +22,8 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const transactions = result.success ? result.data : [];
 
   return (
-    <main className="mx-auto w-full max-w-[1440px] px-4 py-7 sm:px-8 lg:px-10">
-      <header className="mb-7 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <main className="w-full px-4 py-7 sm:px-8 md:flex md:min-h-0 md:flex-1 md:flex-col md:overflow-hidden lg:px-10">
+      <header className="mb-7 flex shrink-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="font-outfit text-3xl font-bold text-[#F8FAFC] sm:text-[40px]">
             Orçamento pessoal
@@ -40,12 +40,12 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       </header>
 
       {!result.success && (
-        <p className="mb-6 rounded-lg border border-[#F87171]/30 bg-[#F87171]/10 px-4 py-3 text-sm text-[#F87171]">
+        <p className="mb-6 shrink-0 rounded-lg border border-[#F87171]/30 bg-[#F87171]/10 px-4 py-3 text-sm text-[#F87171]">
           {result.message}
         </p>
       )}
 
-      <div className="space-y-5">
+      <div className="space-y-5 md:flex md:min-h-0 md:flex-1 md:flex-col md:space-y-0 md:gap-5">
         <SummaryCards transactions={transactions} />
         <TransactionTable
           transactions={transactions}

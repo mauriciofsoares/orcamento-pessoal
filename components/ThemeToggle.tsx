@@ -72,7 +72,7 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
       title={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
-      className="ml-auto inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-[#334155] bg-[#1E293B] text-[#94A3B8] transition-colors hover:border-[#10B981] hover:text-[#F8FAFC]"
+      className="inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-[#334155] bg-[#1E293B] text-[#94A3B8] transition-colors hover:border-[#10B981] hover:text-[#F8FAFC]"
     >
       {isDark ? (
         <Sun className="pointer-events-none size-4" aria-hidden />

@@ -109,7 +109,7 @@ export function SummaryCards({
   const projectedBalance = totalIncome - totalExpenses;
 
   return (
-    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+    <section className="grid shrink-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
       <SummaryCard
         label="Saldo atual"
         value={balance}

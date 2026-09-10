@@ -72,9 +72,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="pt-BR"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} dark h-full overflow-hidden antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} dark min-h-full antialiased md:h-full md:overflow-hidden`}
     >
-      <body className="h-full flex flex-col overflow-hidden">
+      <body className="flex min-h-full flex-col md:h-full md:overflow-hidden">
         <ServiceWorkerRegister />
         <MainNav user={user} />
         {children}

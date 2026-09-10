@@ -19,6 +19,17 @@ function getUserName(user: User) {
   return typeof name === "string" && name.trim() ? name.trim() : user.email;
 }
 
+function getUserInitials(user: User) {
+  const name = getUserName(user) ?? "Saldo Seguro";
+
+  return name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
 export function MainNav({ user }: { user: User | null }) {
   const pathname = usePathname();
 
@@ -32,14 +43,14 @@ export function MainNav({ user }: { user: User | null }) {
   }
 
   return (
-    <header className="border-b border-[#334155] bg-[#0F172A]">
-      <div className="mx-auto flex h-[76px] w-full max-w-[1440px] items-center gap-3 px-4 sm:gap-8 sm:px-8 lg:px-10">
+    <header className="shrink-0 border-b border-[#334155] bg-[#0F172A]">
+      <div className="flex h-[76px] w-full items-center gap-3 px-4 sm:gap-8 sm:px-8 lg:px-10">
         <span className="flex shrink-0 items-center gap-2.5 font-outfit text-xl font-bold text-[#F8FAFC]">
           <img alt="" className="size-10 rounded-[10px]" src="/icon-192.png" />
           <span className="hidden sm:inline">Saldo Seguro</span>
         </span>
 
-        <nav className="flex min-w-0 items-center gap-1">
+        <nav className="flex min-w-0 items-center gap-1.5">
           {LINKS.map(({ href, label, icon: Icon }) => {
             const isActive = pathname === href;
 
@@ -61,9 +72,10 @@ export function MainNav({ user }: { user: User | null }) {
           })}
         </nav>
 
-        <div className="ml-auto flex min-w-0 items-center gap-3">
+        <div className="ml-auto flex min-w-0 items-center gap-4">
+          <ThemeToggle />
           {user && (
-            <div className="flex min-w-0 items-center gap-2" title={user.email ?? undefined}>
+            <div className="flex min-w-0 items-center gap-3" title={user.email ?? undefined}>
               <div className="hidden min-w-0 text-right sm:block">
                 <p className="max-w-40 truncate text-sm font-bold text-[#F8FAFC]">
                   {getUserName(user)}
@@ -74,10 +86,15 @@ export function MainNav({ user }: { user: User | null }) {
                   </p>
                 )}
               </div>
+              <div
+                aria-label={`Perfil de ${getUserName(user) ?? "usuário"}`}
+                className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[#334155] bg-[#10B981] text-xs font-bold text-white"
+              >
+                {getUserInitials(user)}
+              </div>
               <LogoutButton />
             </div>
           )}
-          <ThemeToggle />
         </div>
       </div>
     </header>

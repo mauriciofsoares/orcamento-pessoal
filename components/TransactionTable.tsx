@@ -391,8 +391,8 @@ export function TransactionTable({
     : [{ label: "Excluir", onClick: () => runDelete("single") }];
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-[#334155] bg-[#1E293B]">
-      <header className="flex flex-col gap-3 border-b border-[#334155] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="overflow-hidden rounded-2xl border border-[#334155] bg-[#1E293B] md:flex md:min-h-0 md:flex-1 md:flex-col">
+      <header className="flex shrink-0 flex-col gap-3 border-b border-[#334155] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-outfit text-xl font-semibold text-[#F8FAFC]">Lançamentos</h2>
           <p className="text-xs text-[#64748B]">
@@ -426,10 +426,10 @@ export function TransactionTable({
             ))}
           </div>
 
-          <div className="hidden overflow-x-auto md:block">
+          <div className="hidden min-h-0 flex-1 overflow-auto [scrollbar-color:#475569_#172033] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#475569] [&::-webkit-scrollbar-thumb:hover]:bg-[#64748B] [&::-webkit-scrollbar-track]:bg-[#172033] md:block">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead>
-              <tr className="border-b border-[#334155] text-xs font-semibold uppercase text-[#64748B]">
+              <tr className="sticky top-0 border-b border-[#334155] bg-[#1E293B] text-xs font-semibold uppercase text-[#64748B]">
                 <th className="px-5 py-3.5 font-semibold">Título</th>
                 <th className="px-5 py-3.5 font-semibold">Método</th>
                 <th className="px-5 py-3.5 font-semibold">Vencimento</th>
