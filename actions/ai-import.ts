@@ -257,13 +257,18 @@ function normalizePaymentMethod(value: unknown, sourceLine = "") {
   return value.trim().slice(0, 60);
 }
 
+function capitalizeInitial(text: string) {
+  if (!text) return text;
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 function cleanFallbackTitle(line: string, amountRaw: string, dateRaw?: string) {
   let title = line;
 
   if (dateRaw) title = title.replace(dateRaw, " ");
   if (amountRaw) title = title.replace(amountRaw, " ");
 
-  return title
+  const cleaned = title
     .replace(/^\s*entradas:\s*/i, "")
     .replace(/\bR\$\b/g, " ")
     .replace(/R\$\s*[+-]?\s*(?:\d{1,3}(?:\.\d{3})*,\d{2}|\d+,\d{2}|\d+(?:\.\d{2})?)/g, " ")
@@ -275,6 +280,8 @@ function cleanFallbackTitle(line: string, amountRaw: string, dateRaw?: string) {
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 120);
+
+  return capitalizeInitial(cleaned);
 }
 
 function isIgnoredSummaryLine(line: string) {
@@ -524,6 +531,7 @@ export async function importWithAIAction(
       system:
         "Voc\u00ea extrai lan\u00e7amentos financeiros de textos em portugu\u00eas do Brasil. " +
         "Responda apenas com os dados estruturados, sem coment\u00e1rios. " +
+        "T\u00cdTULO: o t\u00edtulo do lan\u00e7amento deve sempre ter a primeira letra mai\u00fascula (ex: 'Fatura', 'Condom\u00ednio', 'Sal\u00e1rio'). " +
         "DATAS: o texto usa o padr\u00e3o brasileiro DIA/M\u00caS/ANO, nunca m\u00eas/dia. " +
         "Em '05/09/2026' o dia \u00e9 05 e o m\u00eas \u00e9 09, resultando em 2026-09-05. " +
         "Em '10/09/2026' o dia \u00e9 10 e o m\u00eas \u00e9 09, resultando em 2026-09-10. " +

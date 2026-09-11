@@ -58,6 +58,31 @@ describe("saveAiTransactionsAction ownership", () => {
   });
 });
 
+describe("importWithAIAction normalization", () => {
+  it("converte a primeira letra do titulo para maiuscula", async () => {
+    ai.generateObject.mockResolvedValueOnce({
+      object: {
+        transactions: [
+          {
+            title: "fatura",
+            amount: 300,
+            dueDate: "2026-09-12",
+            type: "EXPENSE",
+            paymentMethod: "Boleto",
+          },
+        ],
+      },
+    });
+
+    const result = await importWithAIAction("fatura 300,00 12/09/2026");
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.transactions[0].title).toBe("Fatura");
+    }
+  });
+});
+
 describe("importWithAIAction authentication", () => {
   it("allows an authenticated user to reach the mocked provider", async () => {
     const result = await importWithAIAction("Conta teste 10,00");
