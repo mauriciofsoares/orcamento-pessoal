@@ -37,6 +37,7 @@ const DEFAULT_VALUES: TransactionFormValues = {
   recurrence: "SINGLE",
   frequency: "MONTHLY",
   occurrences: 1,
+  initialInstallment: 1,
 };
 
 function toFormValues(transaction: TransactionDTO): TransactionFormValues {
@@ -50,6 +51,7 @@ function toFormValues(transaction: TransactionDTO): TransactionFormValues {
     recurrence: "SINGLE",
     frequency: "MONTHLY",
     occurrences: 1,
+    initialInstallment: 1,
   };
 }
 
@@ -93,6 +95,8 @@ export function TransactionForm({
   });
 
   const recurrence = useWatch({ control, name: "recurrence" });
+  const occurrences = useWatch({ control, name: "occurrences" });
+  const initialInstallment = useWatch({ control, name: "initialInstallment" });
   const isSeries = recurrence !== "SINGLE";
 
   function close() {
@@ -138,9 +142,14 @@ export function TransactionForm({
     }
 
     const total = values.recurrence === "SINGLE" ? 1 : values.occurrences;
+    const startInstallment = values.recurrence === "INSTALLMENT" ? values.initialInstallment : 1;
+    const rowCount = values.recurrence === "INSTALLMENT"
+      ? Math.max(total - startInstallment + 1, 1)
+      : total;
+
     toast.success(
-      total > 1
-        ? `${total} lançamentos criados para "${values.title}"`
+      rowCount > 1
+        ? `${rowCount} lançamentos criados para "${values.title}"`
         : `"${values.title}" cadastrado`,
     );
 
@@ -343,6 +352,7 @@ export function TransactionForm({
                             "occurrences",
                             option.value === "SINGLE" ? 1 : 12,
                           );
+                          setValue("initialInstallment", 1);
                         }}
                         className={`rounded-lg border px-3 py-1.5 text-sm transition-colors ${
                           recurrence === option.value
@@ -378,6 +388,27 @@ export function TransactionForm({
                         )}
                       </div>
 
+                      {recurrence === "INSTALLMENT" && (
+                        <div>
+                          <label className={labelClass} htmlFor="initialInstallment">
+                            Parcela atual
+                          </label>
+                          <input
+                            id="initialInstallment"
+                            type="number"
+                            min="1"
+                            max={MAX_OCCURRENCES}
+                            className={fieldClass}
+                            {...register("initialInstallment", { valueAsNumber: true })}
+                          />
+                          {errors.initialInstallment && (
+                            <p className={errorClass}>
+                              {errors.initialInstallment.message}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
                       {recurrence === "FIXED" && (
                         <div>
                           <label className={labelClass} htmlFor="frequency">
@@ -403,7 +434,9 @@ export function TransactionForm({
 
                   <p className="mt-3 text-xs text-slate-500 dark:text-slate-500">
                     {recurrence === "INSTALLMENT"
-                      ? "Informe o valor de cada parcela. O título recebe o sufixo (1/12)."
+                      ? initialInstallment > 1 && initialInstallment <= occurrences
+                        ? `Informe o valor de cada parcela. Serão geradas as parcelas de (${initialInstallment}/${occurrences}) até (${occurrences}/${occurrences}).`
+                        : `Informe o valor de cada parcela. O título recebe o sufixo (1/${occurrences || 12}).`
                       : recurrence === "FIXED"
                         ? "Gera as próximas ocorrências com o mesmo valor e dia de vencimento."
                         : "Lançamento avulso, sem repetição."}

@@ -131,28 +131,42 @@ export async function createTransactionAction(
     recurrence,
     frequency,
     occurrences,
+    initialInstallment = 1,
   } = parsed.data;
 
+  const startInstallment = recurrence === "INSTALLMENT" ? initialInstallment : 1;
   const total = recurrence === "SINGLE" ? 1 : occurrences;
   const monthStep = recurrence === "FIXED" && frequency === "YEARLY" ? 12 : 1;
-  const groupId = total > 1 ? randomUUID() : null;
+  const groupId = total > 1 || startInstallment > 1 ? randomUUID() : null;
 
-  const rows = Array.from({ length: total }, (_, index) => ({
-    title:
-      recurrence === "INSTALLMENT" ? `${title} (${index + 1}/${total})` : title,
-    type,
-    paymentMethod,
-    dueDate: addMonthsUTC(dueDate, index * monthStep),
-    amount: amount.toFixed(2),
-    // Só a primeira ocorrência pode nascer paga; as futuras são sempre em aberto.
-    isPaid: index === 0 ? isPaid : false,
-    groupId,
-    recurrence,
-    frequency: recurrence === "FIXED" ? frequency : null,
-    installmentNumber: recurrence === "INSTALLMENT" ? index + 1 : null,
-    installmentTotal: recurrence === "INSTALLMENT" ? total : null,
-    userId: user.id,
-  }));
+  const rowCount =
+    recurrence === "INSTALLMENT"
+      ? Math.max(total - startInstallment + 1, 1)
+      : total;
+
+  const rows = Array.from({ length: rowCount }, (_, index) => {
+    const instNumber =
+      recurrence === "INSTALLMENT" ? startInstallment + index : null;
+
+    return {
+      title:
+        recurrence === "INSTALLMENT"
+          ? `${title} (${instNumber}/${total})`
+          : title,
+      type,
+      paymentMethod,
+      dueDate: addMonthsUTC(dueDate, index * monthStep),
+      amount: amount.toFixed(2),
+      // Só a primeira ocorrência pode nascer paga; as futuras são sempre em aberto.
+      isPaid: index === 0 ? isPaid : false,
+      groupId,
+      recurrence,
+      frequency: recurrence === "FIXED" ? frequency : null,
+      installmentNumber: instNumber,
+      installmentTotal: recurrence === "INSTALLMENT" ? total : null,
+      userId: user.id,
+    };
+  });
 
   try {
     const createdRows = await prisma.transaction.createManyAndReturn({

@@ -179,6 +179,24 @@ describe("create ownership", () => {
     });
   });
 
+  it("suporta criacao de parcelas iniciando em parcela especifica (ex: 3 de 10)", async () => {
+    const result = await createTransactionAction({
+      ...validInput,
+      title: "Financiamento",
+      recurrence: "INSTALLMENT",
+      occurrences: 10,
+      initialInstallment: 3,
+    });
+
+    expect(result.success).toBe(true);
+    expect(prisma.transaction.createManyAndReturn).toHaveBeenCalledWith({
+      data: expect.arrayContaining([
+        expect.objectContaining({ title: "Financiamento (3/10)", installmentNumber: 3, installmentTotal: 10 }),
+        expect.objectContaining({ title: "Financiamento (10/10)", installmentNumber: 10, installmentTotal: 10 }),
+      ]),
+    });
+  });
+
   it("rejects anonymous creation before Prisma", async () => {
     auth.getAuthenticatedUser.mockResolvedValue(null);
 

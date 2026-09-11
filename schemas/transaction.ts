@@ -78,10 +78,21 @@ const transactionBaseSchema = z.object({
     .min(1)
     .max(MAX_OCCURRENCES, `No máximo ${MAX_OCCURRENCES} ocorrências por vez`)
     .default(1),
+  initialInstallment: z.coerce
+    .number()
+    .int("Use um número inteiro")
+    .min(1, "A parcela atual deve ser no mínimo 1")
+    .max(MAX_OCCURRENCES, `No máximo ${MAX_OCCURRENCES} parcelas`)
+    .default(1),
 });
 
 function validateRecurrence(
-  data: { recurrence: string; frequency?: string; occurrences: number },
+  data: {
+    recurrence: string;
+    frequency?: string;
+    occurrences: number;
+    initialInstallment?: number;
+  },
   ctx: z.RefinementCtx,
 ) {
   if (data.recurrence === "SINGLE") return;
@@ -91,6 +102,18 @@ function validateRecurrence(
       code: "custom",
       path: ["occurrences"],
       message: "Informe pelo menos 2 ocorrências",
+    });
+  }
+
+  if (
+    data.recurrence === "INSTALLMENT" &&
+    typeof data.initialInstallment === "number" &&
+    data.initialInstallment > data.occurrences
+  ) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["initialInstallment"],
+      message: "A parcela atual não pode ser maior que o número de parcelas",
     });
   }
 
@@ -130,6 +153,11 @@ export const transactionFormSchema = z.object({
     .int("Use um número inteiro")
     .min(1)
     .max(MAX_OCCURRENCES, `No máximo ${MAX_OCCURRENCES} ocorrências por vez`),
+  initialInstallment: z
+    .number({ message: "Informe a parcela atual" })
+    .int("Use um número inteiro")
+    .min(1, "A parcela atual deve ser no mínimo 1")
+    .max(MAX_OCCURRENCES, `No máximo ${MAX_OCCURRENCES} parcelas`),
 }).superRefine(validateRecurrence);
 
 export type TransactionFormValues = z.infer<typeof transactionFormSchema>;
