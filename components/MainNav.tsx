@@ -13,14 +13,20 @@ const LINKS = [
   { href: "/projection", label: "Projeção", icon: TrendingUp },
 ];
 
-function getUserName(user: User) {
+type AuthUser = {
+  email: string;
+  name?: string | null;
+  user_metadata?: Record<string, unknown>;
+};
+
+function getUserName(user: AuthUser) {
   const metadata = user.user_metadata;
-  const name = metadata.full_name ?? metadata.name;
+  const name = (metadata?.full_name ?? metadata?.name ?? user.name) as string | undefined;
 
   return typeof name === "string" && name.trim() ? name.trim() : user.email;
 }
 
-function getUserInitials(user: User) {
+function getUserInitials(user: AuthUser) {
   const name = getUserName(user) ?? "Saldo Seguro";
 
   return name
@@ -31,7 +37,7 @@ function getUserInitials(user: User) {
     .toUpperCase();
 }
 
-export function MainNav({ user }: { user: User | null }) {
+export function MainNav({ user }: { user: AuthUser | null }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

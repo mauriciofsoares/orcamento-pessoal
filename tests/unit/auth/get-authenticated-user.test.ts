@@ -5,7 +5,7 @@ const supabase = vi.hoisted(() => ({
   auth: { getUser: vi.fn() },
 }));
 const prisma = vi.hoisted(() => ({
-  user: { upsert: vi.fn() },
+  user: { findUnique: vi.fn(), upsert: vi.fn() },
 }));
 
 vi.mock("@/lib/supabase/server", () => ({
@@ -18,6 +18,7 @@ import { getAuthenticatedUser } from "@/lib/auth/get-authenticated-user";
 beforeEach(() => {
   vi.clearAllMocks();
   supabase.auth.getUser.mockResolvedValue({ data: { user: USER_A }, error: null });
+  prisma.user.findUnique.mockResolvedValue(null);
   prisma.user.upsert.mockResolvedValue(USER_A);
 });
 
@@ -25,6 +26,20 @@ describe("getAuthenticatedUser", () => {
   function supabaseUser(overrides: Record<string, unknown> = {}) {
     return { ...USER_A, user_metadata: {}, ...overrides };
   }
+
+  it("returns existing user without upserting when profile is unchanged", async () => {
+    supabase.auth.getUser.mockResolvedValueOnce({
+      data: { user: supabaseUser({ user_metadata: { name: "User A" } }) },
+      error: null,
+    });
+    prisma.user.findUnique.mockResolvedValueOnce(USER_A);
+
+    const result = await getAuthenticatedUser();
+
+    expect(result).toEqual(USER_A);
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { id: USER_A.id } });
+    expect(prisma.user.upsert).not.toHaveBeenCalled();
+  });
 
   it("maps a valid Supabase user and upserts by the same id", async () => {
     const result = await getAuthenticatedUser();
