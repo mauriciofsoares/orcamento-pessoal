@@ -22,7 +22,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const transactions = result.success ? result.data : [];
 
   return (
-    <main className="w-full px-4 py-7 sm:px-8 md:flex md:min-h-0 md:flex-1 md:flex-col md:overflow-hidden lg:px-10">
+    <main className="w-full px-4 py-7 sm:px-8 md:min-h-0 md:flex-1 md:overflow-y-auto md:[scrollbar-color:#475569_#172033] md:[scrollbar-width:thin] md:[&::-webkit-scrollbar]:w-2 md:[&::-webkit-scrollbar-thumb]:rounded-full md:[&::-webkit-scrollbar-thumb]:bg-[#475569] md:[&::-webkit-scrollbar-thumb:hover]:bg-[#64748B] md:[&::-webkit-scrollbar-track]:bg-[#172033] lg:px-10">
       <header className="mb-6 flex shrink-0 flex-col gap-5 lg:mb-7 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="font-outfit text-[30px] font-bold text-[#F8FAFC] sm:text-[40px]">
@@ -45,7 +45,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         </p>
       )}
 
-      <div className="space-y-5 md:flex md:min-h-0 md:flex-1 md:flex-col md:space-y-0 md:gap-5">
+      <div className="space-y-5">
         <SummaryCards transactions={transactions} />
         <TransactionTable
           transactions={transactions}

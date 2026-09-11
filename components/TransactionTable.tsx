@@ -391,7 +391,7 @@ export function TransactionTable({
     : [{ label: "Excluir", onClick: () => runDelete("single") }];
 
   return (
-    <section className="overflow-hidden md:flex md:min-h-0 md:flex-1 md:flex-col md:rounded-2xl md:border md:border-[#334155] md:bg-[#1E293B]">
+    <section className="md:rounded-2xl md:border md:border-[#334155] md:bg-[#1E293B]">
       <header className="flex shrink-0 flex-col gap-3 pb-3 md:border-b md:border-[#334155] md:px-5 md:py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-outfit text-xl font-bold text-[#F8FAFC]">Lançamentos</h2>
@@ -426,18 +426,18 @@ export function TransactionTable({
             ))}
           </div>
 
-          <div className="hidden min-h-0 flex-1 overflow-auto [scrollbar-color:#475569_#172033] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#475569] [&::-webkit-scrollbar-thumb:hover]:bg-[#64748B] [&::-webkit-scrollbar-track]:bg-[#172033] md:block">
-          <table className="w-full min-w-[720px] text-left text-sm">
-            <thead>
-              <tr className="sticky top-0 border-b border-[#334155] bg-[#1E293B] text-xs font-semibold uppercase text-[#64748B]">
-                <th className="px-5 py-3.5 font-semibold">Título</th>
-                <th className="px-5 py-3.5 font-semibold">Método</th>
-                <th className="px-5 py-3.5 font-semibold">Vencimento</th>
-                <th className="px-5 py-3.5 text-right font-semibold">Valor</th>
-                <th className="px-5 py-3.5 font-semibold">Status</th>
-                <th className="px-5 py-3.5 text-right font-semibold">Ações</th>
-              </tr>
-            </thead>
+          <div className="hidden overflow-x-auto md:block">
+            <table className="w-full min-w-[720px] text-left text-sm">
+              <thead className="sticky top-0 z-10 bg-[#1E293B]">
+                <tr className="border-b border-[#334155] text-xs font-semibold uppercase text-[#64748B]">
+                  <th className="px-5 py-3.5 font-semibold">Título</th>
+                  <th className="px-5 py-3.5 font-semibold">Método</th>
+                  <th className="px-5 py-3.5 font-semibold">Vencimento</th>
+                  <th className="px-5 py-3.5 text-right font-semibold">Valor</th>
+                  <th className="px-5 py-3.5 font-semibold">Status</th>
+                  <th className="px-5 py-3.5 text-right font-semibold">Ações</th>
+                </tr>
+              </thead>
             <tbody>
               {transactions.map((transaction) => (
                 <TransactionRow
