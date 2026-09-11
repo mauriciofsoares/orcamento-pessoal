@@ -510,6 +510,16 @@ export function AiImportButton() {
                     {`${Math.floor(recordingSeconds / 60).toString().padStart(2, "0")}:${(recordingSeconds % 60).toString().padStart(2, "0")}`}
                   </p>
                   <p className="text-center text-[13px] text-[#94A3B8]">Continue falando ou toque no microfone para parar</p>
+                  <button
+                    type="button"
+                    onClick={stopRecording}
+                    aria-label="Parar gravação"
+                    aria-pressed={stage === "recording"}
+                    className="relative flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#F87171] bg-[#F87171]/10 text-[#F87171] transition-colors"
+                  >
+                    <span className="absolute inset-0 animate-ping rounded-xl border border-[#F87171]/60" aria-hidden />
+                    <Square className="relative size-4 fill-current" aria-hidden />
+                  </button>
                 </div>
                 <div className="w-full rounded-lg border border-[#334155] bg-[#172033] p-4">
                   <div className="flex items-center justify-between gap-3 text-[13px]">
@@ -533,15 +543,14 @@ export function AiImportButton() {
                 <div className="mt-5 flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={stage === "recording" ? stopRecording : startRecording}
+                    onClick={startRecording}
                     disabled={stage === "requesting-permission" || stage === "transcribing"}
-                    aria-label={stage === "recording" ? "Parar gravação" : "Falar lançamento"}
-                    aria-pressed={stage === "recording"}
-                    className={`relative flex size-11 shrink-0 items-center justify-center rounded-xl border text-[#10B981] transition-colors ${stage === "recording" ? "border-[#F87171] bg-[#F87171]/10 text-[#F87171]" : "border-[#10B981] bg-[#10B981]/10 hover:bg-[#10B981]/20"} disabled:cursor-not-allowed disabled:opacity-60`}
+                    aria-label="Falar lançamento"
+                    className="relative flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#10B981] bg-[#10B981]/10 text-[#10B981] transition-colors hover:bg-[#10B981]/20 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                      {stage === "recording" ? <><span className="absolute inset-0 animate-ping rounded-xl border border-[#F87171]/60" aria-hidden /><Square className="relative size-4 fill-current" aria-hidden /></> : <Mic className="size-5" aria-hidden />}
-                    </button>
-                    <div role="status" aria-live="polite">
+                    <Mic className="size-5" aria-hidden />
+                  </button>
+                  <div role="status" aria-live="polite">
                       <p className="text-sm font-bold text-[#F8FAFC]">{stage === "requesting-permission" ? "Preparando microfone..." : stage === "transcribing" ? "Transcrevendo..." : "Fale seus lançamentos"}</p>
                       <p className="mt-1 text-[13px] leading-5 text-[#94A3B8]">
                         {"Diga os valores e descrições - o sistema converte em lançamento."}

@@ -25,7 +25,7 @@ export function MonthFilter({
   }
 
   const selectClass =
-    "cursor-pointer rounded-lg border border-[#334155] bg-[#172033] px-3 py-2 text-sm font-bold text-[#F8FAFC] outline-none transition-colors hover:border-[#475569] focus:border-[#10B981]";
+    "h-[42px] cursor-pointer appearance-none rounded-lg border border-[#334155] bg-[#172033] bg-[linear-gradient(45deg,transparent_50%,#94A3B8_50%),linear-gradient(135deg,#94A3B8_50%,transparent_50%)] bg-[position:calc(100%-16px)_17px,calc(100%-11px)_17px] bg-[size:5px_5px,5px_5px] bg-no-repeat px-3 pr-9 text-sm font-bold text-[#F8FAFC] outline-none transition-colors hover:border-[#475569] focus:border-[#10B981] [&>option]:bg-[#172033] [&>option]:text-[#F8FAFC]";
 
   return (
     <div
