@@ -11,6 +11,7 @@ import {
 
 const auth = vi.hoisted(() => ({
   getAuthenticatedUser: vi.fn(),
+  getAuthenticatedIdentity: vi.fn(),
 }));
 
 const prisma = vi.hoisted(() => {
@@ -37,6 +38,7 @@ const prisma = vi.hoisted(() => {
 });
 
 vi.mock("@/lib/auth/get-authenticated-user", () => auth);
+vi.mock("@/lib/auth/get-authenticated-identity", () => auth);
 vi.mock("@/lib/prisma", () => ({ prisma }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
@@ -64,6 +66,7 @@ const validInput = {
 beforeEach(() => {
   vi.clearAllMocks();
   auth.getAuthenticatedUser.mockResolvedValue(USER_A);
+  auth.getAuthenticatedIdentity.mockResolvedValue(USER_A);
   const row = makeTransaction();
   const series = makeSeries();
   prisma.transaction.findMany.mockResolvedValue([row]);
@@ -93,7 +96,7 @@ describe("transaction reads", () => {
   });
 
   it("filters transactions by USER_B", async () => {
-    auth.getAuthenticatedUser.mockResolvedValue(USER_B);
+    auth.getAuthenticatedIdentity.mockResolvedValue(USER_B);
 
     await getTransactionsAction();
 
@@ -103,11 +106,11 @@ describe("transaction reads", () => {
   });
 
   it("rejects anonymous reads before Prisma", async () => {
-    auth.getAuthenticatedUser.mockResolvedValue(null);
+    auth.getAuthenticatedIdentity.mockResolvedValue(null);
 
     const result = await getTransactionsAction();
 
-    expect(auth.getAuthenticatedUser).toHaveBeenCalledOnce();
+    expect(auth.getAuthenticatedIdentity).toHaveBeenCalledOnce();
     expect(result.success).toBe(false);
     expect(prisma.transaction.findMany).not.toHaveBeenCalled();
   });
@@ -115,7 +118,7 @@ describe("transaction reads", () => {
 
 describe("projection", () => {
   it.each([USER_A, USER_B])("filters projection by %s", async (user) => {
-    auth.getAuthenticatedUser.mockResolvedValue(user);
+    auth.getAuthenticatedIdentity.mockResolvedValue(user);
 
     await getProjectionAction(6);
 
@@ -125,11 +128,11 @@ describe("projection", () => {
   });
 
   it("rejects anonymous projection before Prisma", async () => {
-    auth.getAuthenticatedUser.mockResolvedValue(null);
+    auth.getAuthenticatedIdentity.mockResolvedValue(null);
 
     const result = await getProjectionAction(6);
 
-    expect(auth.getAuthenticatedUser).toHaveBeenCalledOnce();
+    expect(auth.getAuthenticatedIdentity).toHaveBeenCalledOnce();
     expect(result.success).toBe(false);
     expect(prisma.transaction.findMany).not.toHaveBeenCalled();
   });

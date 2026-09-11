@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { USER_A, USER_B } from "../fixtures";
 
-const auth = vi.hoisted(() => ({ getAuthenticatedUser: vi.fn() }));
+const auth = vi.hoisted(() => ({ getAuthenticatedUser: vi.fn(), getAuthenticatedIdentity: vi.fn() }));
 const prisma = vi.hoisted(() => ({
   transaction: { create: vi.fn() },
   $transaction: vi.fn(async (operations: Promise<unknown>[]) => Promise.all(operations)),
@@ -10,6 +10,7 @@ const ai = vi.hoisted(() => ({ generateObject: vi.fn() }));
 const groq = vi.hoisted(() => ({ groq: vi.fn(() => ({ mocked: true })) }));
 
 vi.mock("@/lib/auth/get-authenticated-user", () => auth);
+vi.mock("@/lib/auth/get-authenticated-identity", () => auth);
 vi.mock("@/lib/prisma", () => ({ prisma }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("ai", () => ai);
@@ -30,6 +31,7 @@ const items = [
 beforeEach(() => {
   vi.clearAllMocks();
   auth.getAuthenticatedUser.mockResolvedValue(USER_A);
+  auth.getAuthenticatedIdentity.mockResolvedValue(USER_A);
   prisma.transaction.create.mockResolvedValue({});
   ai.generateObject.mockResolvedValue({ object: { transactions: items } });
 });
@@ -87,17 +89,17 @@ describe("importWithAIAction authentication", () => {
   it("allows an authenticated user to reach the mocked provider", async () => {
     const result = await importWithAIAction("Conta teste 10,00");
 
-    expect(auth.getAuthenticatedUser).toHaveBeenCalledOnce();
+    expect(auth.getAuthenticatedIdentity).toHaveBeenCalledOnce();
     expect(result.success).toBe(true);
     expect(ai.generateObject).toHaveBeenCalled();
   });
 
   it("rejects anonymous users before calling Groq", async () => {
-    auth.getAuthenticatedUser.mockResolvedValue(null);
+    auth.getAuthenticatedIdentity.mockResolvedValue(null);
 
     const result = await importWithAIAction("Conta teste 10,00");
 
-    expect(auth.getAuthenticatedUser).toHaveBeenCalledOnce();
+    expect(auth.getAuthenticatedIdentity).toHaveBeenCalledOnce();
     expect(result.success).toBe(false);
     expect(ai.generateObject).not.toHaveBeenCalled();
   });

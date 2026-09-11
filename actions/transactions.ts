@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import { getAuthenticatedUser } from "@/lib/auth/get-authenticated-user";
+import { getAuthenticatedIdentity } from "@/lib/auth/get-authenticated-identity";
 import {
   transactionFiltersSchema,
   transactionSchema,
@@ -168,7 +169,7 @@ export async function createTransactionAction(
 export async function getTransactionsAction(
   filters?: unknown,
 ): Promise<ActionResult<TransactionDTO[]>> {
-  const user = await getAuthenticatedUser();
+  const user = await getAuthenticatedIdentity();
   if (!user) return { success: false, message: "Usuário não autenticado." };
 
   const parsed = transactionFiltersSchema.safeParse(filters ?? {});
@@ -408,7 +409,7 @@ export async function getProjectionAction(
   months: number,
   startingBalance = 0,
 ): Promise<ActionResult<MonthProjection[]>> {
-  const user = await getAuthenticatedUser();
+  const user = await getAuthenticatedIdentity();
   if (!user) return { success: false, message: "Usuário não autenticado." };
 
   const horizon = Math.min(Math.max(Math.trunc(months) || 12, 1), 24);

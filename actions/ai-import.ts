@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { parseCurrencyInput } from "@/lib/format";
 import type { ActionResult } from "@/actions/transactions";
 import { getAuthenticatedUser } from "@/lib/auth/get-authenticated-user";
+import { getAuthenticatedIdentity } from "@/lib/auth/get-authenticated-identity";
 
 const MAX_INPUT_CHARS = 8000;
 const MAX_ITEMS = 200;
@@ -493,7 +494,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number) {
 export async function importWithAIAction(
   rawText: string,
 ): Promise<ActionResult<{ transactions: AiTransaction[]; discarded: number }>> {
-  const user = await getAuthenticatedUser();
+  const user = await getAuthenticatedIdentity();
   if (!user) return { success: false, message: "Usuário não autenticado." };
 
   const text = rawText.trim();

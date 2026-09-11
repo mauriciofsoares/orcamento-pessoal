@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Check, CircleX, Loader2, Mic, MicOff, Pencil, Sparkles, Square, Trash2 } from "lucide-react";
+import { Check, CircleX, Eraser, Loader2, Mic, MicOff, Pencil, Sparkles, Square, Trash2 } from "lucide-react";
 import {
   importWithAIAction,
   saveAiTransactionsAction,
@@ -529,33 +529,74 @@ export function AiImportButton() {
                   <p className="mt-2 text-sm leading-[1.5] text-[#94A3B8]">A transcrição será exibida quando você tocar em parar.</p>
                 </div>
               </div>
-            ) : stage === "idle" || stage === "requesting-permission" || stage === "transcribing" ? (
+            ) : stage === "idle" || stage === "requesting-permission" ? (
               <>
-                <textarea
-                  value={rawText}
-                  onChange={(event) => setRawText(event.target.value)}
-                  placeholder={PLACEHOLDER}
-                  rows={8}
-                  disabled={isBusy}
-                  readOnly={stage !== "idle"}
-                  className="h-[224px] w-full resize-none rounded-lg border border-[#334155] bg-[#020617] p-3.5 text-sm leading-5 text-[#F8FAFC] outline-none transition-colors placeholder:text-[#64748B] focus:border-[#10B981] disabled:opacity-60"
-                />
+                <div className="relative">
+                  <textarea
+                    value={rawText}
+                    onChange={(event) => setRawText(event.target.value)}
+                    placeholder={PLACEHOLDER}
+                    rows={8}
+                    disabled={isBusy}
+                    readOnly={stage !== "idle"}
+                    className="h-[224px] w-full resize-none rounded-lg border border-[#334155] bg-[#020617] p-3.5 pr-11 text-sm leading-5 text-[#F8FAFC] outline-none transition-colors placeholder:text-[#64748B] focus:border-[#10B981] disabled:opacity-60"
+                  />
+                  {rawText.length > 0 && stage === "idle" && !isBusy && (
+                    <button
+                      type="button"
+                      onClick={() => setRawText("")}
+                      title="Limpar texto"
+                      aria-label="Limpar texto"
+                      className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-lg border border-[#334155] bg-[#172033] text-[#94A3B8] transition-colors hover:border-[#475569] hover:bg-[#1E293B] hover:text-[#F8FAFC]"
+                    >
+                      <Eraser className="size-4" aria-hidden />
+                    </button>
+                  )}
+                </div>
                 <div className="mt-5 flex items-center gap-3">
                   <button
                     type="button"
                     onClick={startRecording}
-                    disabled={stage === "requesting-permission" || stage === "transcribing"}
+                    disabled={stage === "requesting-permission"}
                     aria-label="Falar lançamento"
                     className="relative flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#10B981] bg-[#10B981]/10 text-[#10B981] transition-colors hover:bg-[#10B981]/20 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <Mic className="size-5" aria-hidden />
                   </button>
                   <div role="status" aria-live="polite">
-                      <p className="text-sm font-bold text-[#F8FAFC]">{stage === "requesting-permission" ? "Preparando microfone..." : stage === "transcribing" ? "Transcrevendo..." : "Fale seus lançamentos"}</p>
-                      <p className="mt-1 text-[13px] leading-5 text-[#94A3B8]">
-                        {"Diga os valores e descrições - o sistema converte em lançamento."}
-                      </p>
-                    </div>
+                    <p className="text-sm font-bold text-[#F8FAFC]">{stage === "requesting-permission" ? "Preparando microfone..." : "Fale seus lançamentos"}</p>
+                    <p className="mt-1 text-[13px] leading-5 text-[#94A3B8]">
+                      {"Diga os valores e descrições - o sistema converte em lançamento."}
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : stage === "transcribing" ? (
+              <>
+                <div className="flex h-[224px] flex-col justify-center gap-3 rounded-lg border border-[#334155] bg-[#020617] p-4">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-[#10B981]">
+                    <Loader2 className="size-4 animate-spin" aria-hidden />
+                    <span>Transcrevendo áudio...</span>
+                  </div>
+                  {["w-full", "w-3/4", "w-5/6", "w-2/3", "w-full"].map((width, index) => (
+                    <span key={index} className={`h-3 animate-pulse rounded-full bg-[#1E293B] ${width}`} />
+                  ))}
+                </div>
+                <div className="mt-5 flex items-center gap-3">
+                  <button
+                    type="button"
+                    disabled
+                    aria-label="Transcrevendo..."
+                    className="relative flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#10B981]/50 bg-[#10B981]/5 text-[#10B981]/50 disabled:cursor-not-allowed"
+                  >
+                    <Loader2 className="size-5 animate-spin" aria-hidden />
+                  </button>
+                  <div role="status" aria-live="polite">
+                    <p className="text-sm font-bold text-[#F8FAFC]">Transcrevendo...</p>
+                    <p className="mt-1 text-[13px] leading-5 text-[#94A3B8]">
+                      Convertendo áudio em texto para processar o lançamento.
+                    </p>
+                  </div>
                 </div>
               </>
             ) : stage === "analyzing" ? (

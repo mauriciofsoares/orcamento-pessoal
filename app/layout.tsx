@@ -4,8 +4,10 @@ import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import { Toaster } from "sonner";
 import { MainNav } from "@/components/MainNav";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
-import { getAuthenticatedUser } from "@/lib/auth/get-authenticated-user";
-import type { UserModel } from "@/generated/prisma/models/User";
+import {
+  getAuthenticatedIdentity,
+  type AuthenticatedIdentity,
+} from "@/lib/auth/get-authenticated-identity";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,10 +61,10 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  let user: UserModel | null = null;
+  let user: AuthenticatedIdentity | null = null;
 
   try {
-    user = await getAuthenticatedUser();
+    user = await getAuthenticatedIdentity();
   } catch {
     user = null;
   }

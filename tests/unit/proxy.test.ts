@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const supabaseAuth = vi.hoisted(() => ({ getUser: vi.fn() }));
+const supabaseAuth = vi.hoisted(() => ({ getUser: vi.fn(), getClaims: vi.fn() }));
 
 vi.mock("@supabase/ssr", () => ({
   createServerClient: vi.fn(() => ({ auth: supabaseAuth })),
@@ -60,7 +60,7 @@ afterEach(() => {
 
 describe("proxy - rota protegida com usuario autenticado", () => {
   it("permite o acesso (200) quando ha sessao Supabase valida", async () => {
-    supabaseAuth.getUser.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    supabaseAuth.getClaims.mockResolvedValue({ data: { claims: { sub: "u1" } }, error: null });
 
     const response = await proxy(makeRequest("/"));
 
@@ -68,7 +68,7 @@ describe("proxy - rota protegida com usuario autenticado", () => {
   });
 
   it("nao redireciona para /login com sessao valida", async () => {
-    supabaseAuth.getUser.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    supabaseAuth.getClaims.mockResolvedValue({ data: { claims: { sub: "u1" } }, error: null });
 
     const response = await proxy(makeRequest("/projection"));
 
@@ -78,7 +78,7 @@ describe("proxy - rota protegida com usuario autenticado", () => {
 
 describe("proxy - rota protegida com usuario anonimo", () => {
   it("redireciona para /login quando nao ha sessao", async () => {
-    supabaseAuth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    supabaseAuth.getClaims.mockResolvedValue({ data: null, error: null });
 
     const response = await proxy(makeRequest("/"));
 
@@ -87,7 +87,7 @@ describe("proxy - rota protegida com usuario anonimo", () => {
   });
 
   it("preserva a rota original em ?next= para redirecionar de volta apos o login", async () => {
-    supabaseAuth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    supabaseAuth.getClaims.mockResolvedValue({ data: null, error: null });
 
     const response = await proxy(makeRequest("/projection", { search: "?month=2026-09" }));
 
@@ -98,7 +98,7 @@ describe("proxy - rota protegida com usuario anonimo", () => {
   });
 
   it("nao adiciona ?next= quando a rota protegida e a propria raiz", async () => {
-    supabaseAuth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    supabaseAuth.getClaims.mockResolvedValue({ data: null, error: null });
 
     const response = await proxy(makeRequest("/"));
 
@@ -107,8 +107,8 @@ describe("proxy - rota protegida com usuario anonimo", () => {
 });
 
 describe("proxy - sessao invalida/expirada (Casos 1 e 2 da auditoria)", () => {
-  it("Caso 1: getUser() retorna { user: null, error: null } -> redireciona para /login", async () => {
-    supabaseAuth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+  it("Caso 1: getClaims() retorna { data: null, error: null } -> redireciona para /login", async () => {
+    supabaseAuth.getClaims.mockResolvedValue({ data: null, error: null });
 
     const response = await proxy(makeRequest("/"));
 
@@ -116,9 +116,9 @@ describe("proxy - sessao invalida/expirada (Casos 1 e 2 da auditoria)", () => {
     expect(response.headers.get("location")).toBe("https://app.example/login");
   });
 
-  it("Caso 2: getUser() retorna { user: null, error: <erro> } -> redireciona para /login (mesmo comportamento do Caso 1)", async () => {
-    supabaseAuth.getUser.mockResolvedValue({
-      data: { user: null },
+  it("Caso 2: getClaims() retorna { data: null, error: <erro> } -> redireciona para /login (mesmo comportamento do Caso 1)", async () => {
+    supabaseAuth.getClaims.mockResolvedValue({
+      data: null,
       error: new Error("invalid_token"),
     });
 
@@ -128,8 +128,8 @@ describe("proxy - sessao invalida/expirada (Casos 1 e 2 da auditoria)", () => {
     expect(response.headers.get("location")).toBe("https://app.example/login");
   });
 
-  it("getUser() lancando excecao (falha de rede) tambem redireciona para /login, sem erro 500", async () => {
-    supabaseAuth.getUser.mockRejectedValue(new Error("network down"));
+  it("getClaims() lancando excecao (falha de rede) tambem redireciona para /login, sem erro 500", async () => {
+    supabaseAuth.getClaims.mockRejectedValue(new Error("network down"));
 
     const response = await proxy(makeRequest("/"));
 
@@ -143,7 +143,7 @@ describe("proxy - rota publica com usuario anonimo", () => {
     const response = await proxy(makeRequest("/login"));
 
     expect(response.status).toBe(200);
-    expect(supabaseAuth.getUser).not.toHaveBeenCalled();
+    expect(supabaseAuth.getClaims).not.toHaveBeenCalled();
   });
 });
 

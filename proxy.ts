@@ -51,8 +51,8 @@ async function hasSupabaseUser(request: NextRequest, response: NextResponse) {
       },
     });
 
-    const { data } = await supabase.auth.getUser();
-    return Boolean(data.user);
+    const { data } = await supabase.auth.getClaims();
+    return Boolean(data?.claims?.sub);
   } catch {
     return false;
   }
