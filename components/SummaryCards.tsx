@@ -59,7 +59,7 @@ function SummaryCard({
             {label}
           </p>
           <p
-            className={`mt-2 break-words font-outfit text-xl font-bold tabular-nums leading-tight sm:text-2xl ${
+            className={`mt-2 whitespace-nowrap font-outfit text-[18px] font-bold tabular-nums leading-tight sm:text-2xl ${
               valueClassName ?? styles.value
             }`}
           >
