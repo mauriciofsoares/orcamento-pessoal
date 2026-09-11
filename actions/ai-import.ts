@@ -19,32 +19,41 @@ const MODEL = process.env.GROQ_MODEL ?? "openai/gpt-oss-20b";
 const extractionSchema = z.object({
   transactions: z.array(
     z.object({
-      title: z.string().describe("Nome da conta, d\u00edvida ou receita"),
-      amount: z.number().describe("Valor em reais, apenas o n\u00famero"),
+      title: z.string().nullable().describe("Nome da conta, dívida ou receita; null se ausente"),
+      amount: z.number().nullable().describe("Valor em reais, apenas o número; null se ausente"),
       dueDate: z
         .string()
-        .describe(
-          "Data de vencimento em YYYY-MM-DD. Se a coluna Vencimento estiver vazia, use a data de hoje.",
-        ),
+        .nullable()
+        .describe("Data em YYYY-MM-DD; null se não informada"),
       type: z
         .enum(["INCOME", "EXPENSE"])
+        .nullable()
         .describe(
           "Classifique como INCOME quando o dinheiro entra: Salario, Pix recebido, Deposito, Credito recebido, TED recebida, Transferencia recebida, Rendimento, Receita, Reembolso ou valor com sinal +. Classifique como EXPENSE quando o dinheiro sai: compras, pagamentos, contas, boletos, Uber, iFood, assinaturas, cartao de credito ou valor com sinal -.",
         ),
       paymentMethod: z
         .string()
-        .describe("Forma de pagamento, como Boleto, Pix ou Cartao de credito"),
+        .nullable()
+        .describe("Forma de pagamento; null se não informada"),
     }),
   ),
 });
 
 export type AiTransaction = {
-  title: string;
-  amount: number;
-  dueDate: string;
-  type: "INCOME" | "EXPENSE";
-  paymentMethod: string;
+  title: string | null;
+  amount: number | null;
+  dueDate: string | null;
+  type: "INCOME" | "EXPENSE" | null;
+  paymentMethod: string | null;
 };
+
+const aiDraftSchema = z.object({
+  title: z.string().trim().min(1).max(120).nullable(),
+  amount: z.number().positive().max(99_999_999.99).nullable(),
+  dueDate: z.union([z.iso.date(), z.null()]),
+  type: z.enum(["INCOME", "EXPENSE"]).nullable(),
+  paymentMethod: z.string().trim().min(1).max(60).nullable(),
+});
 
 // Segunda validacao, agora desconfiando do modelo: datas e valores impossiveis sao descartados.
 const persistedSchema = z.object({
@@ -114,10 +123,6 @@ const EXPENSE_KEYWORDS = [
 
 function stripAccents(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
-
-function todayIsoDate() {
-  return new Date().toISOString().slice(0, 10);
 }
 
 function toIsoDate(value: unknown) {
@@ -237,8 +242,12 @@ function isCurrencyText(value: unknown) {
 }
 
 function normalizePaymentMethod(value: unknown, sourceLine = "") {
+  if (value === null || value === undefined) {
+    return sourceLine ? inferPaymentMethod(sourceLine) : null;
+  }
+
   if (typeof value !== "string" || value.trim() === "" || isCurrencyText(value)) {
-    return inferPaymentMethod(sourceLine);
+    return sourceLine ? inferPaymentMethod(sourceLine) : null;
   }
 
   if (stripAccents(value).trim() === "nao informado") {
@@ -295,7 +304,7 @@ function extractStartingBalanceLine(line: string) {
   return {
     title: "Saldo inicial",
     amount: amount.value,
-    dueDate: todayIsoDate(),
+    dueDate: null,
     type: "INCOME" as const,
     paymentMethod: "N\u00e3o informado",
   };
@@ -364,10 +373,10 @@ function extractFromTableLine(
       (column): column is string =>
         typeof column === "string" && z.iso.date().safeParse(column).success,
     );
-  const dueDate = dateColumn ?? todayIsoDate();
+  const dueDate = dateColumn ?? null;
 
   return {
-    title: title || "Lancamento importado",
+    title: title || null,
     amount: amount.value,
     dueDate,
     type: classifyLine(line, fallbackType),
@@ -389,8 +398,8 @@ function fallbackExtractTransactions(text: string): AiTransaction[] {
 
       const startingBalance = extractStartingBalanceLine(trimmed);
       if (startingBalance) {
-        const parsed = persistedSchema.safeParse(startingBalance);
-        if (parsed.success && isRealDate(parsed.data.dueDate)) {
+        const parsed = aiDraftSchema.safeParse(startingBalance);
+        if (parsed.success && parsed.data.dueDate && isRealDate(parsed.data.dueDate)) {
           fallbackItems.push(parsed.data);
         }
       }
@@ -405,8 +414,8 @@ function fallbackExtractTransactions(text: string): AiTransaction[] {
 
     const tableItem = extractFromTableLine(trimmed, sectionType);
     if (tableItem) {
-      const parsed = persistedSchema.safeParse(tableItem);
-      if (parsed.success && isRealDate(parsed.data.dueDate)) {
+        const parsed = aiDraftSchema.safeParse(tableItem);
+        if (parsed.success && parsed.data.dueDate && isRealDate(parsed.data.dueDate)) {
         fallbackItems.push(parsed.data);
       }
       continue;
@@ -416,21 +425,21 @@ function fallbackExtractTransactions(text: string): AiTransaction[] {
     const amount = findAmountInLine(trimmed);
     if (!amount) continue;
 
-    const dueDate = date && typeof date.iso === "string" ? date.iso : todayIsoDate();
+    const dueDate = date && typeof date.iso === "string" ? date.iso : null;
 
     const title = cleanFallbackTitle(trimmed, amount.raw, date?.raw);
     if (isIgnoredExtractedTitle(title)) continue;
 
     const item = {
-      title: title || "Lancamento importado",
+      title: title || null,
       amount: amount.value,
       dueDate,
       type: classifyLine(trimmed, sectionType),
       paymentMethod: inferPaymentMethod(trimmed),
     };
 
-    const parsed = persistedSchema.safeParse(item);
-    if (parsed.success && isRealDate(parsed.data.dueDate)) {
+    const parsed = aiDraftSchema.safeParse(item);
+    if (parsed.success && parsed.data.dueDate && isRealDate(parsed.data.dueDate)) {
       fallbackItems.push(parsed.data);
     }
   }
@@ -452,7 +461,7 @@ function normalizeExtractedItem(item: unknown) {
       typeof candidate.amount === "number"
         ? Math.abs(candidate.amount)
         : candidate.amount,
-    dueDate: toIsoDate(candidate.dueDate),
+    dueDate: candidate.dueDate === null ? null : toIsoDate(candidate.dueDate),
     paymentMethod: normalizePaymentMethod(candidate.paymentMethod),
   };
 }
@@ -520,7 +529,7 @@ export async function importWithAIAction(
         "Em '10/09/2026' o dia \u00e9 10 e o m\u00eas \u00e9 09, resultando em 2026-09-10. " +
         "Meses por extenso ou abreviados tamb\u00e9m s\u00e3o brasileiros: JAN=01, FEV=02, MAR=03, ABR=04, MAI=05, JUN=06, JUL=07, AGO=08, SET=09, OUT=10, NOV=11, DEZ=12. " +
         "Exemplos de datas: '05 SET' vira 2026-09-05, '10 setembro 2026' vira 2026-09-10. " +
-        "Se o ano n\u00e3o aparecer, use o ano atual. Se uma tabela tiver coluna Vencimento vazia, use a data de hoje como dueDate. " +
+        "Se o ano n\u00e3o aparecer, use o ano atual. Se a data n\u00e3o for informada, retorne dueDate como null. " +
         "Converta valores do formato brasileiro (1.234,56) para n\u00famero (1234.56) e sempre positivo. " +
         "TABELAS: quando o texto tiver colunas como Divida, Forma de pagamento, Vencimento e VALOR, cada linha com valor numerico e um lancamento. Ignore linhas com 'R$ -'. Ignore Total dividas, Saldo atual, subtotais e cabecalhos. " +
         "Em tabelas de orcamento, linhas depois de 'Saldo atual' normalmente sao entradas/receitas, exceto quando houver sinal ou palavra clara de despesa. " +
@@ -532,7 +541,7 @@ export async function importWithAIAction(
         "Exemplos de EXPENSE: '- 42,90 iFood', '10 SET UBER -27,80', 'Uber 27,80', 'Pagamento boleto aluguel 1.500,00', 'Netflix assinatura 39,90', 'Compra cart\u00e3o de cr\u00e9dito 230,00'. " +
         "Se houver conflito, priorize sinais expl\u00edcitos: '+' e palavras como recebido/deposito/rendimento indicam INCOME; '-' e palavras como pagamento/compra/fatura indicam EXPENSE. " +
         "Ignore saldos, totais, subtotais, cabe\u00e7alhos e qualquer linha que n\u00e3o seja um lan\u00e7amento individual. " +
-        "Se n\u00e3o houver forma de pagamento expl\u00edcita, use 'N\u00e3o informado'.",
+        "Se n\u00e3o houver forma de pagamento expl\u00edcita, retorne paymentMethod como null. Nunca invente t\u00edtulo, valor, data, tipo ou forma de pagamento ausentes.",
       prompt: `Hoje \u00e9 ${new Date().toISOString().slice(0, 10)}.\n\nExtraia os lan\u00e7amentos deste texto:\n\n${text}`,
       }),
       TIMEOUT_MS,
@@ -541,11 +550,11 @@ export async function importWithAIAction(
     const valid: AiTransaction[] = [];
 
     for (const item of object.transactions.slice(0, MAX_ITEMS)) {
-      const parsed = persistedSchema.safeParse(normalizeExtractedItem(item));
+      const parsed = aiDraftSchema.safeParse(normalizeExtractedItem(item));
       if (
         parsed.success &&
-        isRealDate(parsed.data.dueDate) &&
-        !isIgnoredExtractedTitle(parsed.data.title)
+        (parsed.data.dueDate === null || isRealDate(parsed.data.dueDate)) &&
+        (parsed.data.title === null || !isIgnoredExtractedTitle(parsed.data.title))
       ) {
         valid.push(parsed.data);
       }

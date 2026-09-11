@@ -111,11 +111,45 @@ describe("Recuperação de senha - contrato de comportamento", () => {
 });
 
 describe("Intelligent launch contract", () => {
+  it("grava, transcreve e reutiliza a análise existente", () => {
+    expect(aiImportButtonSource).toContain("MediaRecorder");
+    expect(aiImportButtonSource).toContain('fetch("/api/transcribe"');
+    expect(aiImportButtonSource).toContain('setStage("recording")');
+    expect(aiImportButtonSource).toContain('setStage("transcribing")');
+    expect(aiImportButtonSource).toContain("handleExtract(text)");
+    expect(aiImportButtonSource).toContain("getTracks().forEach");
+  });
+
+  it("informa claramente quando o microfone está escutando", () => {
+    expect(aiImportButtonSource).toContain("Captando áudio");
+    expect(aiImportButtonSource).toContain("Ouvindo...");
+    expect(aiImportButtonSource).toContain('aria-live="polite"');
+    expect(aiImportButtonSource).toContain('aria-pressed={stage === "recording"}');
+    expect(aiImportButtonSource).toContain("animate-ping");
+  });
+
+  it("altera o texto do cabeçalho ao entrar no estado de captura", () => {
+    expect(aiImportButtonSource).toContain('stage === "recording"');
+    expect(aiImportButtonSource).toContain("Fale naturalmente. O sistema identifica valores");
+    expect(aiImportButtonSource).toContain('"Parar e revisar"');
+  });
+
+  it("permite cancelar uma transcrição pendente", () => {
+    expect(aiImportButtonSource).toContain("new AbortController()");
+    expect(aiImportButtonSource).toContain("controller.abort()");
+    expect(aiImportButtonSource).toContain("signal: controller.signal");
+    expect(aiImportButtonSource).toContain('stage !== "requesting-permission"');
+  });
+
   it("models explicit input analysis and results states", () => {
-    expect(aiImportButtonSource).toContain('type IntelligentLaunchState = "idle" | "analyzing" | "results"');
+    expect(aiImportButtonSource).toContain('"requesting-permission"');
     expect(aiImportButtonSource).toContain('setStage("analyzing")');
     expect(aiImportButtonSource).toContain('setStage("results")');
     expect(aiImportButtonSource).toContain('stage === "analyzing"');
+  });
+
+  it("não mantém logs temporários de áudio no cliente", () => {
+    expect(aiImportButtonSource).not.toContain("[voice]");
   });
 
   it("prevents duplicate analysis and recovers to the input state", () => {
