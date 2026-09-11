@@ -51,7 +51,7 @@ export function ConfirmModal({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-modal-title"
-        className="relative w-full max-w-[350px] rounded-[24px] border border-[#334155] bg-[#1E293B] p-8 text-center shadow-[0_24px_64px_-12px_rgba(0,0,0,0.4)]"
+        className="relative w-full max-w-[420px] rounded-[24px] border border-[#334155] bg-[#1E293B] p-6 text-center shadow-[0_24px_64px_-12px_rgba(0,0,0,0.4)] sm:p-8"
       >
         <button
           type="button"
@@ -79,12 +79,12 @@ export function ConfirmModal({
           </div>
         </div>
 
-        <div className="mt-6 flex gap-2.5">
+        <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
           <button
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="h-12 flex-1 rounded-lg border border-[#334155] px-4 text-sm font-bold text-[#F8FAFC] transition-colors hover:bg-[#172033] disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-11 w-full flex-1 rounded-lg border border-[#334155] px-3 text-sm font-bold text-[#F8FAFC] transition-colors hover:bg-[#172033] disabled:cursor-not-allowed disabled:opacity-60"
           >
             Cancelar
           </button>
@@ -95,7 +95,7 @@ export function ConfirmModal({
               type="button"
               onClick={action.onClick}
               disabled={isPending}
-              className={`h-12 flex-1 rounded-lg px-4 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+              className={`h-11 w-full flex-1 whitespace-nowrap rounded-lg px-3 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
                 action.tone === "neutral"
                   ? "border border-[#334155] text-[#F8FAFC] hover:bg-[#172033]"
                   : "bg-[#F87171] text-white hover:bg-[#FB7185]"
