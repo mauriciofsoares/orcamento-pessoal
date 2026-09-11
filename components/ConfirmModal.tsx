@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
-import { AlertTriangle, X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 
 export type ConfirmAction = {
   label: string;
@@ -28,20 +28,22 @@ export function ConfirmModal({
     if (!open) return;
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape" && !isPending) onClose();
     }
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [open, onClose]);
+  }, [open, onClose, isPending]);
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm dark:bg-slate-950/80"
-        onClick={onClose}
+        className="absolute inset-0 bg-[#020617]/90 backdrop-blur-sm"
+        onClick={() => {
+          if (!isPending) onClose();
+        }}
         aria-hidden
       />
 
@@ -49,39 +51,40 @@ export function ConfirmModal({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-modal-title"
-        className="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+        className="relative w-full max-w-[350px] rounded-[24px] border border-[#334155] bg-[#1E293B] p-8 text-center shadow-[0_24px_64px_-12px_rgba(0,0,0,0.4)]"
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Fechar"
-          className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+          disabled={isPending}
+          className="absolute right-4 top-4 rounded-lg p-1.5 text-[#94A3B8] transition-colors hover:bg-[#172033] hover:text-[#F8FAFC]"
         >
           <X className="size-4" aria-hidden />
         </button>
 
-        <div className="flex gap-4">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-rose-500/10 text-rose-400">
-            <AlertTriangle className="size-5" aria-hidden />
+        <div className="flex flex-col items-center">
+          <span className="flex size-12 items-center justify-center rounded-2xl bg-[#F87171]/10 text-[#F87171]">
+            <Trash2 className="size-6" aria-hidden />
           </span>
 
-          <div className="min-w-0 pt-1">
+          <div className="mt-5 min-w-0">
             <h2
               id="confirm-modal-title"
-              className="pr-6 text-base font-semibold text-slate-950 dark:text-slate-100"
+              className="font-outfit text-2xl font-bold text-[#F8FAFC]"
             >
               {title}
             </h2>
-            <div className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">{description}</div>
+            <div className="mt-2 text-sm leading-5 text-[#94A3B8]">{description}</div>
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <div className="mt-6 flex gap-2.5">
           <button
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            className="h-12 flex-1 rounded-lg border border-[#334155] px-4 text-sm font-bold text-[#F8FAFC] transition-colors hover:bg-[#172033] disabled:cursor-not-allowed disabled:opacity-60"
           >
             Cancelar
           </button>
@@ -92,10 +95,10 @@ export function ConfirmModal({
               type="button"
               onClick={action.onClick}
               disabled={isPending}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+              className={`h-12 flex-1 rounded-lg px-4 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
                 action.tone === "neutral"
-                  ? "border border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-                  : "bg-rose-600 text-white hover:bg-rose-500"
+                  ? "border border-[#334155] text-[#F8FAFC] hover:bg-[#172033]"
+                  : "bg-[#F87171] text-white hover:bg-[#FB7185]"
               }`}
             >
               {action.label}

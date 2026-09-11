@@ -18,6 +18,8 @@ const recoverPasswordFormSource = readFileSync(
 );
 const newPasswordFormSource = readFileSync("app/nova-senha/NewPasswordForm.tsx", "utf8");
 const logoutButtonSource = readFileSync("components/LogoutButton.tsx", "utf8");
+const aiImportButtonSource = readFileSync("components/AiImportButton.tsx", "utf8");
+const confirmModalSource = readFileSync("components/ConfirmModal.tsx", "utf8");
 
 describe("LoginForm - contrato de comportamento (login email/senha)", () => {
   it("autentica via supabase.auth.signInWithPassword", () => {
@@ -34,7 +36,7 @@ describe("LoginForm - contrato de comportamento (login email/senha)", () => {
     expect(loginFormSource).toContain("router.refresh()");
   });
 
-  it("exibe mensagem genérica de erro de credenciais, sem revelar se o e-mail existe (design Figma)", () => {
+  it("exibe mensagem genÃ©rica de erro de credenciais, sem revelar se o e-mail existe (design Figma)", () => {
     expect(loginFormSource).toContain('setError("E-mail ou senha incorretos.")');
     expect(loginFormSource).not.toContain("setError(signInError.message)");
   });
@@ -93,7 +95,7 @@ describe("SignUpForm - contrato de comportamento (next preservado, igual a Login
   });
 });
 
-describe("Recuperação de senha - contrato de comportamento", () => {
+describe("RecuperaÃ§Ã£o de senha - contrato de comportamento", () => {
   it("envia o link por resetPasswordForEmail com callback seguro para /nova-senha", () => {
     expect(recoverPasswordFormSource).toContain("supabase.auth.resetPasswordForEmail");
     expect(recoverPasswordFormSource).toContain(
@@ -105,6 +107,48 @@ describe("Recuperação de senha - contrato de comportamento", () => {
     expect(newPasswordFormSource).toContain("supabase.auth.updateUser({ password })");
     expect(newPasswordFormSource).toContain('toast.success("Senha atualizada com sucesso.")');
     expect(newPasswordFormSource).toContain('router.replace("/")');
+  });
+});
+
+describe("Intelligent launch contract", () => {
+  it("models explicit input analysis and results states", () => {
+    expect(aiImportButtonSource).toContain('type IntelligentLaunchState = "idle" | "analyzing" | "results"');
+    expect(aiImportButtonSource).toContain('setStage("analyzing")');
+    expect(aiImportButtonSource).toContain('setStage("results")');
+    expect(aiImportButtonSource).toContain('stage === "analyzing"');
+  });
+
+  it("prevents duplicate analysis and recovers to the input state", () => {
+    expect(aiImportButtonSource).toContain('if (stage !== "idle" || isBusy) return;');
+    expect(aiImportButtonSource).toContain('setStage("idle")');
+    expect(aiImportButtonSource).toContain("try {");
+    expect(aiImportButtonSource).toContain("} finally {");
+  });
+
+  it("mostra dados reais analisados em cards e salva pela Server Action existente", () => {
+    expect(aiImportButtonSource).toContain("preview.map");
+    expect(aiImportButtonSource).toContain("saveAiTransactionsAction(preview)");
+    expect(aiImportButtonSource).toContain("Salvar ${preview.length} lanÃ§amento");
+  });
+
+  it("requires confirmation before removing a preview item", () => {
+    expect(aiImportButtonSource).toContain("<ConfirmModal");
+    expect(aiImportButtonSource).toContain("deletingItem?.title");
+    expect(aiImportButtonSource).toContain("removePreviewItem");
+  });
+
+  it("locks analysis controls and keeps type editable in the local draft", () => {
+    expect(aiImportButtonSource).toContain("disabled={isBusy}");
+    expect(aiImportButtonSource).toContain('aria-label="Tipo"');
+    expect(aiImportButtonSource).toContain('updatePreviewItem("type", event.target.value)');
+  });
+});
+
+describe("Confirmation dialog pending contract", () => {
+  it("does not close with Escape, backdrop, or close button while pending", () => {
+    expect(confirmModalSource).toContain('event.key === "Escape" && !isPending');
+    expect(confirmModalSource).toContain("if (!isPending) onClose()");
+    expect(confirmModalSource).toContain("disabled={isPending}");
   });
 });
 

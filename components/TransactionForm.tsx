@@ -54,9 +54,11 @@ function toFormValues(transaction: TransactionDTO): TransactionFormValues {
 }
 
 const fieldClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-400 focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-600";
-const labelClass = "mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400";
-const errorClass = "mt-1 text-xs text-rose-600 dark:text-rose-400";
+  "h-12 w-full rounded-lg border border-[#334155] bg-[#020617] px-3 text-sm text-[#F8FAFC] outline-none transition-colors placeholder:text-[#64748B] focus:border-[#10B981]";
+const selectClass =
+  "h-12 w-full cursor-pointer appearance-none rounded-xl border border-[#334155] bg-[#0F172A] bg-[linear-gradient(45deg,transparent_50%,#94A3B8_50%),linear-gradient(135deg,#94A3B8_50%,transparent_50%)] bg-[position:calc(100%-18px)_20px,calc(100%-13px)_20px] bg-[size:5px_5px,5px_5px] bg-no-repeat px-4 pr-10 text-base text-[#F8FAFC] outline-none transition-colors focus:border-[#10B981] [&>option]:bg-[#172033] [&>option]:text-[#F8FAFC]";
+const labelClass = "mb-1.5 block text-xs font-medium text-[#94A3B8]";
+const errorClass = "mt-1 text-xs text-[#F87171]";
 
 export function TransactionForm({
   initialData,
@@ -162,7 +164,7 @@ export function TransactionForm({
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm dark:bg-slate-950/80"
+            className="absolute inset-0 bg-[#020617]/90 backdrop-blur-sm"
             onClick={close}
             aria-hidden
           />
@@ -171,17 +173,17 @@ export function TransactionForm({
             role="dialog"
             aria-modal="true"
             aria-labelledby="transaction-form-title"
-            className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+            className="relative max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#334155] bg-[#172033] p-6 shadow-[0_24px_64px_-12px_rgba(0,0,0,0.4)]"
           >
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
                 <h2
                   id="transaction-form-title"
-                  className="text-lg font-semibold text-slate-950 dark:text-slate-100"
+                  className="font-outfit text-2xl font-bold text-[#F8FAFC]"
                 >
                   {isEditing ? "Editar lançamento" : "Novo lançamento"}
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-500">
+                <p className="text-xs text-[#94A3B8]">
                   {isEditing
                     ? "Altere os dados e salve as mudanças."
                     : "Cadastre uma receita ou despesa do mês."}
@@ -191,7 +193,7 @@ export function TransactionForm({
                 type="button"
                 onClick={close}
                 aria-label="Fechar"
-                className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+                className="rounded-lg p-1.5 text-[#94A3B8] transition-colors hover:bg-[#0F172A] hover:text-[#F8FAFC]"
               >
                 <X className="size-4" aria-hidden />
               </button>
@@ -218,7 +220,7 @@ export function TransactionForm({
                   <label className={labelClass} htmlFor="type">
                     Tipo
                   </label>
-                  <select id="type" className={fieldClass} {...register("type")}>
+                  <select id="type" className={selectClass} {...register("type")}>
                     <option value="EXPENSE">Despesa</option>
                     <option value="INCOME">Receita</option>
                   </select>
@@ -233,7 +235,7 @@ export function TransactionForm({
                   </label>
                   <select
                     id="paymentMethod"
-                    className={fieldClass}
+                    className={selectClass}
                     {...register("paymentMethod")}
                   >
                     {PAYMENT_METHODS.map((method) => (
@@ -383,7 +385,7 @@ export function TransactionForm({
                           </label>
                           <select
                             id="frequency"
-                            className={fieldClass}
+                            className={selectClass}
                             {...register("frequency")}
                           >
                             <option value="MONTHLY">Mensal</option>
@@ -428,14 +430,14 @@ export function TransactionForm({
                 <button
                   type="button"
                   onClick={close}
-                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                  className="rounded-lg border border-[#334155] bg-[#0F172A] px-4 py-2 text-sm font-semibold text-[#F8FAFC] transition-colors hover:bg-[#020617]"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-lg bg-gradient-to-r from-[#0FBA82] to-[#33D499] px-4 py-2 text-sm font-bold text-[#020617] shadow-[0_10px_24px_-8px_rgba(16,185,129,0.2)] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isSubmitting
                     ? "Salvando..."
