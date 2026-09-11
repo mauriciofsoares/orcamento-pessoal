@@ -155,13 +155,15 @@ export async function createTransactionAction(
   }));
 
   try {
-    const [created] = await prisma.$transaction(
-      rows.map((data) => prisma.transaction.create({ data })),
-    );
+    const createdRows = await prisma.transaction.createManyAndReturn({
+      data: rows,
+    });
+    const created = createdRows[0];
 
     revalidateBudget();
     return { success: true, data: toDTO(created, startOfToday()) };
-  } catch {
+  } catch (error) {
+    console.error("Erro ao criar lançamento:", error);
     return { success: false, message: "Não foi possível salvar o lançamento." };
   }
 }

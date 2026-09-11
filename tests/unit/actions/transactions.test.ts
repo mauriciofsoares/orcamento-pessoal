@@ -17,6 +17,7 @@ const auth = vi.hoisted(() => ({
 const prisma = vi.hoisted(() => {
   const transaction = {
     create: vi.fn(),
+    createManyAndReturn: vi.fn(),
     findMany: vi.fn(),
     findFirst: vi.fn(),
     findFirstOrThrow: vi.fn(),
@@ -81,6 +82,9 @@ beforeEach(() => {
   });
   prisma.transaction.findFirstOrThrow.mockResolvedValue(row);
   prisma.transaction.create.mockResolvedValue(row);
+  prisma.transaction.createManyAndReturn.mockImplementation(({ data }: { data: Record<string, unknown>[] }) =>
+    data.map((item) => ({ ...row, ...item })),
+  );
   prisma.transaction.update.mockResolvedValue(row);
   prisma.transaction.updateMany.mockResolvedValue({ count: 1 });
   prisma.transaction.deleteMany.mockResolvedValue({ count: 1 });
@@ -143,8 +147,8 @@ describe("create ownership", () => {
     const result = await createTransactionAction({ ...validInput, userId: USER_B.id });
 
     expect(result.success).toBe(true);
-    expect(prisma.transaction.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({ userId: USER_A.id }),
+    expect(prisma.transaction.createManyAndReturn).toHaveBeenCalledWith({
+      data: [expect.objectContaining({ userId: USER_A.id })],
     });
   });
 
@@ -153,8 +157,25 @@ describe("create ownership", () => {
 
     await createTransactionAction(validInput);
 
-    expect(prisma.transaction.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({ userId: USER_B.id }),
+    expect(prisma.transaction.createManyAndReturn).toHaveBeenCalledWith({
+      data: [expect.objectContaining({ userId: USER_B.id })],
+    });
+  });
+
+  it("suporta criacao de 120 parcelas via createManyAndReturn", async () => {
+    const result = await createTransactionAction({
+      ...validInput,
+      title: "Ademicon",
+      recurrence: "INSTALLMENT",
+      occurrences: 120,
+    });
+
+    expect(result.success).toBe(true);
+    expect(prisma.transaction.createManyAndReturn).toHaveBeenCalledWith({
+      data: expect.arrayContaining([
+        expect.objectContaining({ title: "Ademicon (1/120)", installmentNumber: 1, installmentTotal: 120 }),
+        expect.objectContaining({ title: "Ademicon (120/120)", installmentNumber: 120, installmentTotal: 120 }),
+      ]),
     });
   });
 
@@ -165,7 +186,7 @@ describe("create ownership", () => {
 
     expect(result.success).toBe(false);
     expect(auth.getAuthenticatedUser).toHaveBeenCalledOnce();
-    expect(prisma.transaction.create).not.toHaveBeenCalled();
+    expect(prisma.transaction.createManyAndReturn).not.toHaveBeenCalled();
   });
 });
 
