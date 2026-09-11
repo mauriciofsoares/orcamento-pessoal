@@ -13,22 +13,22 @@ type Tone = "neutral" | "danger" | "warning" | "critical";
 
 const TONE_STYLES: Record<Tone, { card: string; icon: string; value: string }> = {
   neutral: {
-    card: "border-[#334155] bg-[#1E293B]",
+    card: "border-[#334155] bg-[#172033] sm:bg-[#1E293B]",
     icon: "bg-[#F87171]/10 text-[#F87171]",
     value: "text-[#F87171]",
   },
   danger: {
-    card: "border-[#334155] bg-[#1E293B]",
+    card: "border-[#334155] bg-[#172033] sm:bg-[#1E293B]",
     icon: "bg-[#F8FAFC]/10 text-[#F8FAFC]",
     value: "text-[#F8FAFC]",
   },
   warning: {
-    card: "border-[#334155] bg-[#1E293B]",
+    card: "border-[#334155] bg-[#172033] sm:bg-[#1E293B]",
     icon: "bg-[#FBBF24]/10 text-[#FBBF24]",
     value: "text-[#FBBF24]",
   },
   critical: {
-    card: "border-[#334155] bg-[#1E293B]",
+    card: "border-[#334155] bg-[#172033] sm:bg-[#1E293B]",
     icon: "bg-[#F87171]/10 text-[#F87171]",
     value: "text-[#F87171]",
   },
@@ -52,21 +52,21 @@ function SummaryCard({
   const styles = TONE_STYLES[tone];
 
   return (
-    <div className={`min-h-[132px] rounded-2xl border p-3.5 sm:min-h-[140px] sm:p-5 ${styles.card}`}>
+    <div className={`h-[132px] overflow-hidden rounded-2xl border p-3.5 sm:h-auto sm:min-h-[140px] sm:p-5 ${styles.card}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase text-[#94A3B8] sm:text-xs">
             {label}
           </p>
           <p
-            className={`mt-2 whitespace-nowrap font-outfit text-[18px] font-bold tabular-nums leading-tight sm:text-2xl ${
+            className={`mt-2 whitespace-nowrap font-outfit text-xl font-bold tabular-nums leading-tight sm:text-2xl ${
               valueClassName ?? styles.value
             }`}
           >
             {formatCurrency(value)}
           </p>
         </div>
-        <span className={`rounded-[9px] p-2 ${styles.icon} sm:rounded-xl sm:p-2.5`}>
+        <span className={`flex size-7 shrink-0 items-center justify-center rounded-[9px] ${styles.icon} sm:size-auto sm:rounded-xl sm:p-2.5`}>
           <Icon className="size-3.5 sm:size-[18px]" aria-hidden />
         </span>
       </div>
