@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { User } from "@supabase/supabase-js";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import { Toaster } from "sonner";
 import { MainNav } from "@/components/MainNav";
@@ -79,6 +80,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <ServiceWorkerRegister />
         <MainNav user={user} />
         {children}
+        <Analytics />
         <Toaster theme="system" position="top-right" richColors closeButton />
       </body>
     </html>
